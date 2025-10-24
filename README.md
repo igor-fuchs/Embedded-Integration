@@ -1,2 +1,0 @@
-# TIA Portal Integrations
-
