@@ -1,76 +1,142 @@
+using System.Collections.Concurrent;
 using System.Net;
 using System.Net.WebSockets;
 using System.Text;
 
-namespace Bridge.Services
+namespace OpcUaClientMonitor.Services
 {
-    public class WebSocketServer
+    // Simple WebSocket server using HttpListener + System.Net.WebSockets.WebSocket
+    // Not production-grade but sufficient as a bridge for a React front-end.
+    public class WebSocketServer : IDisposable
     {
-        private readonly List<WebSocket> _clients = new List<WebSocket>();
-        private readonly HttpListener _httpListener;
+        private readonly HttpListener _listener;
+        private readonly ConcurrentDictionary<Guid, WebSocket> _sockets = new();
+        private CancellationTokenSource? _cts;
 
-        public WebSocketServer(string url)
+        public Uri ListenUri { get; }
+
+        public WebSocketServer(string prefix)
         {
-            _httpListener = new HttpListener();
-            _httpListener.Prefixes.Add(url);
+            ListenUri = new Uri(prefix);
+            _listener = new HttpListener();
+            _listener.Prefixes.Add(prefix);
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public async Task StartAsync()
         {
-            _httpListener.Start();
-            Console.WriteLine("WebSocket server started...");
+            _cts = new CancellationTokenSource();
+            _listener.Start();
+            _ = AcceptLoopAsync(_cts.Token);
+            await Task.CompletedTask;
+        }
 
-            while (!cancellationToken.IsCancellationRequested)
+        public async Task StopAsync()
+        {
+            _cts?.Cancel();
+            _listener.Stop();
+
+            foreach (var kv in _sockets)
             {
-                var context = await _httpListener.GetContextAsync();
-                if (context.Request.IsWebSocketRequest)
+                try
                 {
-                    ProcessWebSocketRequest(context);
+                    await kv.Value.CloseAsync(WebSocketCloseStatus.NormalClosure, "Server stopping", CancellationToken.None);
                 }
+                catch { }
+            }
+
+            _sockets.Clear();
+        }
+
+        private async Task AcceptLoopAsync(CancellationToken ct)
+        {
+            while (!ct.IsCancellationRequested)
+            {
+                HttpListenerContext ctx;
+                try
+                {
+                    ctx = await _listener.GetContextAsync();
+                }
+                catch (HttpListenerException)
+                {
+                    break; // listener stopped
+                }
+
+                if (!ctx.Request.IsWebSocketRequest)
+                {
+                    ctx.Response.StatusCode = 400;
+                    ctx.Response.Close();
+                    continue;
+                }
+
+                _ = HandleWebSocketClientAsync(ctx, ct);
             }
         }
 
-        private async void ProcessWebSocketRequest(HttpListenerContext context)
+        private async Task HandleWebSocketClientAsync(HttpListenerContext ctx, CancellationToken ct)
         {
-            var webSocketContext = await context.AcceptWebSocketAsync(null);
-            var webSocket = webSocketContext.WebSocket;
-            _clients.Add(webSocket);
-            Console.WriteLine("WebSocket client connected.");
+            WebSocketContext wsContext = null!;
+            try
+            {
+                wsContext = await ctx.AcceptWebSocketAsync(null);
+            }
+            catch
+            {
+                ctx.Response.StatusCode = 500;
+                ctx.Response.Close();
+                return;
+            }
 
-            await ReceiveMessages(webSocket);
-        }
+            var socket = wsContext.WebSocket;
+            var id = Guid.NewGuid();
+            _sockets[id] = socket;
 
-        private async Task ReceiveMessages(WebSocket webSocket)
-        {
             var buffer = new byte[1024];
 
-            while (webSocket.State == WebSocketState.Open)
+            try
             {
-                var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-                if (result.MessageType == WebSocketMessageType.Text)
+                while (socket.State == WebSocketState.Open && !ct.IsCancellationRequested)
                 {
-                    var message = Encoding.UTF8.GetString(buffer, 0, result.Count);
-                    Console.WriteLine($"Received: {message}");
-                    await BroadcastAsync(message);
+                    var result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), ct);
+                    if (result.MessageType == WebSocketMessageType.Close)
+                    {
+                        break;
+                    }
+
+                    // Echo or ignore payloads from clients in this simple server
                 }
             }
-
-            _clients.Remove(webSocket);
-            Console.WriteLine("WebSocket client disconnected.");
+            catch { }
+            finally
+            {
+                _sockets.TryRemove(id, out _);
+                try { socket.Dispose(); } catch { }
+            }
         }
 
-        private async Task BroadcastAsync(string message)
+        public async Task BroadcastAsync(string message)
         {
-            var buffer = Encoding.UTF8.GetBytes(message);
-            var segment = new ArraySegment<byte>(buffer);
+            var bytes = Encoding.UTF8.GetBytes(message);
+            var segment = new ArraySegment<byte>(bytes);
 
-            foreach (var client in _clients)
+            foreach (var kv in _sockets)
             {
-                if (client.State == WebSocketState.Open)
+                var socket = kv.Value;
+                if (socket.State != WebSocketState.Open) continue;
+                try
                 {
-                    await client.SendAsync(segment, WebSocketMessageType.Text, true, CancellationToken.None);
+                    await socket.SendAsync(segment, WebSocketMessageType.Text, true, CancellationToken.None);
+                }
+                catch
+                {
+                    // ignore send errors for now
                 }
             }
+        }
+
+        public void Dispose()
+        {
+            try { _listener.Stop(); } catch { }
+            _cts?.Cancel();
         }
     }
 }
