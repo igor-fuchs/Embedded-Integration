@@ -2,12 +2,9 @@ import './App.css';
 import { useEffect, useState } from 'react';
 import Header from './Header';
 import useWebSocket from './hooks/useWebSocket';
+import { type OpcUaMessage } from './util/interfaces';
 
-interface OpcUaMessage {
-  node: string;
-  timestamp: string; // ou Date, mas vindo por JSON é string
-  value: unknown;
-}
+
 
 function App() {
   // note o genérico para tipar as mensagens
