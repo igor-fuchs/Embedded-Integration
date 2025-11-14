@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.WebSockets;
 using System.Text;
 
-namespace OpcUaClientMonitor.Services
+namespace Bridge.Services
 {
     // Simple WebSocket server using HttpListener + System.Net.WebSockets.WebSocket
     // Not production-grade but sufficient as a bridge for a React front-end.
@@ -137,6 +137,11 @@ namespace OpcUaClientMonitor.Services
         {
             try { _listener.Stop(); } catch { }
             _cts?.Cancel();
+        }
+
+        public void OnSubscriptionEvent(string message)
+        {
+            _ = BroadcastAsync(message);
         }
     }
 }
