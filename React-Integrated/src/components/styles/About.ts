@@ -2,8 +2,8 @@ import styled from "styled-components";
 
 export const StyleAbout = styled.section`
     width: 100%;
+    min-height: calc(100vh - 65px); // Adjust for header height
     background: #0F172A;
-    padding: 96px 0px;
     display: flex;
     justify-content: center;
     align-items: center;

@@ -3,11 +3,13 @@ import styled from "styled-components";
 export const StyleHero = styled.section`
     position: relative;
     width: 100%;
-    min-height: calc(100vh - 65px);
+    min-height: 100vh;
+    padding-top: 65px;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    box-sizing: border-box;
 
     .hero-background {
         position: absolute;

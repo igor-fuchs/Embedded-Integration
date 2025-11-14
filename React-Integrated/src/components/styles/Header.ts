@@ -1,12 +1,17 @@
 import styled from "styled-components";
 
 export const StyleHeader = styled.div`
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
     width: 100%;
     background: #020617;
     border-bottom: 1px solid #1E293B;
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 1000;
 
     .header-nav {
         width: 100%;
