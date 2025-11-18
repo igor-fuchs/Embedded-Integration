@@ -1,0 +1,10 @@
+#root {
+    /* Vars */
+    --header-height: 65px;
+
+    /* Styles */
+    width: 100vw;
+    height: 100vh;
+    background-color: #020617;
+    
+}

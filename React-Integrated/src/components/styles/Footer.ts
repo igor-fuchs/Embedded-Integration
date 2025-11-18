@@ -2,7 +2,6 @@ import styled from "styled-components";
 
 export const StyleFooter = styled.footer`
     width: 100%;
-    padding: 48px 80px;
     background: #0f172a;
     border-top: 1px solid #1e293b;
     display: flex;
@@ -23,14 +22,15 @@ export const StyleFooter = styled.footer`
         justify-content: space-between;
         align-items: center;
         gap: 24px;
+        padding: 48px 80px;
     }
 
     .brand-section {
         display: flex;
         align-items: center;
         gap: 12px;
-        
-        img{
+
+        img {
             width: 32px;
             height: 32px;
         }

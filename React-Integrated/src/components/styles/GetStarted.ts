@@ -2,7 +2,6 @@ import styled from "styled-components";
 
 export const StyleGetStarted = styled.section`
     width: 100%;
-    padding: 96px 80px;
     background: #020617;
     display: flex;
     justify-content: center;
@@ -17,6 +16,7 @@ export const StyleGetStarted = styled.section`
     }
 
     .get-started-content {
+        padding: 96px 80px;
         width: 100%;
         max-width: 896px;
         display: flex;
