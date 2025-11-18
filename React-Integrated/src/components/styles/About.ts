@@ -252,14 +252,13 @@ export const StyleAbout = styled.section`
         width: 64px;
         height: 64px;
         display: flex;
-        padding: 18px 22px;
         justify-content: center;
         align-items: center;
         border-radius: 9999px;
         background: linear-gradient(135deg, #2563eb 0%, #0891b2 70.71%);
         box-shadow: 0 0 20px 0 rgba(37, 99, 235, 0.3);
 
-        svg {
+        img {
             width: 20px;
             height: 20px;
         }

@@ -38,9 +38,14 @@ export const StyleTechnologies = styled.section`
 
     .technologies-title {
         margin: 0;
-        color: #60A5FA;
+        color: #60a5fa;
         text-align: center;
-        font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+        font-family:
+            Inter,
+            -apple-system,
+            Roboto,
+            Helvetica,
+            sans-serif;
         font-size: 48px;
         font-weight: 700;
         line-height: 48px;
@@ -48,9 +53,14 @@ export const StyleTechnologies = styled.section`
 
     .technologies-description {
         margin: 0;
-        color: #94A3B8;
+        color: #94a3b8;
         text-align: center;
-        font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+        font-family:
+            Inter,
+            -apple-system,
+            Roboto,
+            Helvetica,
+            sans-serif;
         font-size: 20px;
         font-weight: 400;
         line-height: 28px;
@@ -70,63 +80,68 @@ export const StyleTechnologies = styled.section`
         padding: 33px;
         border-radius: 16px;
         border: 1px solid #334155;
-        background: rgba(30, 41, 59, 0.50);
+        background: rgba(30, 41, 59, 0.5);
         transition: all 0.3s ease;
 
         &:hover {
             border-color: #475569;
-            background: rgba(30, 41, 59, 0.70);
+            background: rgba(30, 41, 59, 0.7);
             transform: translateY(-4px);
         }
     }
 
     .tech-icon {
+        --icon-radius: 16px;
+
         width: 64px;
         height: 64px;
         display: flex;
         justify-content: center;
         align-items: center;
         padding: 16px;
-        border-radius: 16px;
+        border-radius: var(--icon-radius);
         margin-bottom: 24px;
         box-sizing: border-box;
 
         &.factory-io {
-            background: linear-gradient(135deg, #F97316 0%, #EF4444 70.71%);
+            background: linear-gradient(135deg, #f97316 0%, #ef4444 70.71%);
         }
 
         &.tia-portal {
-            background: linear-gradient(135deg, #2563EB 0%, #4F46E5 70.71%);
-        }
-
-        &.react {
-            background: linear-gradient(135deg, #06B6D4 0%, #3B82F6 70.71%);
-        }
-
-        &.nodejs {
             background: linear-gradient(135deg, #22C55E 0%, #10B981 70.71%);
         }
 
+        &.react {
+            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 70.71%);
+        }
+
+        &.dotnet {
+            padding: 0;
+            img {
+                width: 100%;
+                height: 100%;
+                border-radius: var(--icon-radius);
+            }
+        }
+
         &.siemens-plc {
-            background: linear-gradient(135deg, #A855F7 0%, #EC4899 70.71%);
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 70.71%);
         }
 
         &.pixel-art {
-            background: linear-gradient(135deg, #EAB308 0%, #F97316 70.71%);
-        }
-
-        svg {
-            width: auto;
-            height: auto;
-            max-width: 100%;
-            max-height: 100%;
+            background: linear-gradient(135deg, #eab308 0%, #f97316 70.71%);
         }
     }
 
     .tech-title {
         margin: 0 0 12px 0;
-        color: #FFF;
-        font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+        color: #fff;
+        font-family:
+            Inter,
+            -apple-system,
+            Roboto,
+            Helvetica,
+            sans-serif;
         font-size: 20px;
         font-weight: 600;
         line-height: normal;
@@ -134,8 +149,13 @@ export const StyleTechnologies = styled.section`
 
     .tech-description {
         margin: 0;
-        color: #CBD5E1;
-        font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+        color: #cbd5e1;
+        font-family:
+            Inter,
+            -apple-system,
+            Roboto,
+            Helvetica,
+            sans-serif;
         font-size: 16px;
         font-weight: 400;
         line-height: normal;

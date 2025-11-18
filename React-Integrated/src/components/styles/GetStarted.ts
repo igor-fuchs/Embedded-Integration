@@ -86,7 +86,7 @@ export const StyleGetStarted = styled.section`
         cursor: pointer;
         transition: all 0.3s ease;
 
-        svg {
+        img {
             width: 19px;
             height: 20px;
             flex-shrink: 0;

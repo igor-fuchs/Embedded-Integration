@@ -29,22 +29,10 @@ export const StyleFooter = styled.footer`
         display: flex;
         align-items: center;
         gap: 12px;
-    }
-
-    .brand-icon {
-        width: 32px;
-        height: 32px;
-        display: flex;
-        padding: 6px 9px;
-        justify-content: center;
-        align-items: center;
-        border-radius: 8px;
-        background: linear-gradient(135deg, #60a5fa 0%, #2563eb 70.71%);
-        flex-shrink: 0;
-
-        svg {
-            width: 14px;
-            height: 14px;
+        
+        img{
+            width: 32px;
+            height: 32px;
         }
     }
 

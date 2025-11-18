@@ -1,4 +1,4 @@
-import './App.css';
+import { AppContainer } from './App';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Technologies from './components/Technologies';
@@ -10,7 +10,7 @@ import Footer from './components/Footer';
 function App() {
 
   return (
-    <div>
+    <AppContainer>
       <Header />
       <Hero />
       <About />
@@ -18,7 +18,7 @@ function App() {
       <LiveDemo />
       <GetStarted />
       <Footer />
-    </div>
+    </AppContainer>
   );
 }
 

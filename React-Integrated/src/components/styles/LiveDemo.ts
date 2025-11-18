@@ -158,9 +158,6 @@ export const StyleLiveDemo = styled.section`
 
     .play-icon {
         display: flex;
-        width: 23px;
-        height: 36px;
-        padding: 2.75px 0 3.25px 0;
         flex-direction: column;
         justify-content: center;
         align-items: center;
