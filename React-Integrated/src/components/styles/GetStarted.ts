@@ -30,12 +30,7 @@ export const StyleGetStarted = styled.section`
         margin: 0;
         color: #60a5fa;
         text-align: center;
-        font-family:
-            Inter,
-            -apple-system,
-            Roboto,
-            Helvetica,
-            sans-serif;
+        
         font-size: 48px;
         font-weight: 700;
         line-height: 48px;
@@ -45,12 +40,7 @@ export const StyleGetStarted = styled.section`
         margin: 0;
         color: #94a3b8;
         text-align: center;
-        font-family:
-            Inter,
-            -apple-system,
-            Roboto,
-            Helvetica,
-            sans-serif;
+        
         font-size: 20px;
         font-weight: 400;
         line-height: 28px;
@@ -73,12 +63,7 @@ export const StyleGetStarted = styled.section`
         gap: 12px;
         padding: 18px 32px;
         border-radius: 12px;
-        font-family:
-            Inter,
-            -apple-system,
-            Roboto,
-            Helvetica,
-            sans-serif;
+        
         font-size: 18px;
         font-weight: 600;
         line-height: normal;
@@ -128,7 +113,6 @@ export const StyleGetStarted = styled.section`
     }
 
     .collaboration-card {
-        width: 100%;
         max-width: 672px;
         padding: 32px;
         border-radius: 16px;
@@ -151,12 +135,7 @@ export const StyleGetStarted = styled.section`
         margin: 0;
         color: #fff;
         text-align: center;
-        font-family:
-            Inter,
-            -apple-system,
-            Roboto,
-            Helvetica,
-            sans-serif;
+        
         font-size: 20px;
         font-weight: 600;
         line-height: normal;
@@ -166,12 +145,7 @@ export const StyleGetStarted = styled.section`
         margin: 0;
         color: #cbd5e1;
         text-align: center;
-        font-family:
-            Inter,
-            -apple-system,
-            Roboto,
-            Helvetica,
-            sans-serif;
+        
         font-size: 16px;
         font-weight: 400;
         line-height: normal;
@@ -210,7 +184,6 @@ export const StyleGetStarted = styled.section`
     }
 
     @media (max-width: 1024px) {
-        padding: 80px 60px;
 
         .section-title {
             font-size: 40px;
@@ -224,7 +197,6 @@ export const StyleGetStarted = styled.section`
     }
 
     @media (max-width: 768px) {
-        padding: 64px 40px;
 
         .get-started-content {
             gap: 40px;
@@ -265,10 +237,10 @@ export const StyleGetStarted = styled.section`
     }
 
     @media (max-width: 640px) {
-        padding: 56px 32px;
 
         .get-started-content {
             gap: 36px;
+            padding: 64px 40px;
         }
 
         .section-title {
@@ -300,10 +272,10 @@ export const StyleGetStarted = styled.section`
     }
 
     @media (max-width: 480px) {
-        padding: 48px 24px;
 
         .get-started-content {
             gap: 32px;
+            padding: 40px 20px;
         }
 
         .section-title {

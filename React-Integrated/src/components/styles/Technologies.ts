@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 export const StyleTechnologies = styled.section`
     width: 100%;
-    height: calc(100vh - var(--header-height));
+    min-height: calc(100vh - var(--header-height));
     background: #020617;
     display: flex;
     justify-content: center;
@@ -40,12 +40,7 @@ export const StyleTechnologies = styled.section`
         margin: 0;
         color: #60a5fa;
         text-align: center;
-        font-family:
-            Inter,
-            -apple-system,
-            Roboto,
-            Helvetica,
-            sans-serif;
+        
         font-size: 48px;
         font-weight: 700;
         line-height: 48px;
@@ -55,12 +50,7 @@ export const StyleTechnologies = styled.section`
         margin: 0;
         color: #94a3b8;
         text-align: center;
-        font-family:
-            Inter,
-            -apple-system,
-            Roboto,
-            Helvetica,
-            sans-serif;
+        
         font-size: 20px;
         font-weight: 400;
         line-height: 28px;
@@ -108,7 +98,7 @@ export const StyleTechnologies = styled.section`
         }
 
         &.tia-portal {
-            background: linear-gradient(135deg, #22C55E 0%, #10B981 70.71%);
+            background: linear-gradient(135deg, #22c55e 0%, #10b981 70.71%);
         }
 
         &.react {
@@ -136,12 +126,7 @@ export const StyleTechnologies = styled.section`
     .tech-title {
         margin: 0 0 12px 0;
         color: #fff;
-        font-family:
-            Inter,
-            -apple-system,
-            Roboto,
-            Helvetica,
-            sans-serif;
+        
         font-size: 20px;
         font-weight: 600;
         line-height: normal;
@@ -150,19 +135,16 @@ export const StyleTechnologies = styled.section`
     .tech-description {
         margin: 0;
         color: #cbd5e1;
-        font-family:
-            Inter,
-            -apple-system,
-            Roboto,
-            Helvetica,
-            sans-serif;
+        
         font-size: 16px;
         font-weight: 400;
         line-height: normal;
     }
 
     @media (max-width: 1200px) {
-        padding: 80px 60px;
+        .technologies-content {
+            padding: 80px 60px;
+        }
 
         .technologies-grid {
             gap: 24px;
@@ -170,14 +152,9 @@ export const StyleTechnologies = styled.section`
     }
 
     @media (max-width: 1024px) {
-        padding: 64px 40px;
-
         .technologies-content {
             gap: 48px;
-        }
-
-        .technologies-header {
-            padding: 0 80px;
+            padding: 64px 40px;
         }
 
         .technologies-title {
@@ -197,14 +174,9 @@ export const StyleTechnologies = styled.section`
     }
 
     @media (max-width: 768px) {
-        padding: 48px 24px;
-
         .technologies-content {
             gap: 40px;
-        }
-
-        .technologies-header {
-            padding: 0 40px;
+            padding: 48px 24px;
         }
 
         .technologies-title {
@@ -244,14 +216,9 @@ export const StyleTechnologies = styled.section`
     }
 
     @media (max-width: 640px) {
-        padding: 40px 20px;
-
         .technologies-content {
             gap: 32px;
-        }
-
-        .technologies-header {
-            padding: 0 20px;
+            padding: 40px 20px;
         }
 
         .technologies-title {
@@ -270,12 +237,9 @@ export const StyleTechnologies = styled.section`
     }
 
     @media (max-width: 480px) {
-        padding: 32px 16px;
-
-        .technologies-header {
-            padding: 0;
+        .technologies-content {
+            padding: 32px 16px;
         }
-
         .technologies-title {
             font-size: 24px;
             line-height: 28px;

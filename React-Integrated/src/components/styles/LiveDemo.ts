@@ -2,7 +2,6 @@ import styled from "styled-components";
 
 export const StyleLiveDemo = styled.section`
     width: 100%;
-    padding: 96px 0px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -17,6 +16,7 @@ export const StyleLiveDemo = styled.section`
     }
 
     .demo-content {
+        padding: 64px 40px;
         width: 100%;
         max-width: 1152px;
         display: flex;
@@ -26,7 +26,6 @@ export const StyleLiveDemo = styled.section`
     }
 
     .demo-header {
-        width: 100%;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -38,12 +37,7 @@ export const StyleLiveDemo = styled.section`
     .demo-title {
         margin: 0;
         color: #fff;
-        font-family:
-            Inter,
-            -apple-system,
-            Roboto,
-            Helvetica,
-            sans-serif;
+        
         font-size: 48px;
         font-weight: 700;
         line-height: 48px;
@@ -52,19 +46,13 @@ export const StyleLiveDemo = styled.section`
     .demo-description {
         margin: 0;
         color: #94a3b8;
-        font-family:
-            Inter,
-            -apple-system,
-            Roboto,
-            Helvetica,
-            sans-serif;
+        
         font-size: 20px;
         font-weight: 400;
         line-height: 28px;
     }
 
     .demo-card {
-        width: calc(100% - 66px);
         padding: 33px;
         display: flex;
         flex-direction: column;
@@ -172,12 +160,7 @@ export const StyleLiveDemo = styled.section`
         margin: 0;
         color: #fff;
         text-align: center;
-        font-family:
-            Inter,
-            -apple-system,
-            Roboto,
-            Helvetica,
-            sans-serif;
+        
         font-size: 24px;
         font-weight: 600;
         line-height: 32px;
@@ -188,12 +171,7 @@ export const StyleLiveDemo = styled.section`
         max-width: 448px;
         color: #cbd5e1;
         text-align: center;
-        font-family:
-            Inter,
-            -apple-system,
-            Roboto,
-            Helvetica,
-            sans-serif;
+        
         font-size: 16px;
         font-weight: 400;
         line-height: 24px;
@@ -211,12 +189,7 @@ export const StyleLiveDemo = styled.section`
         background: linear-gradient(90deg, #2563eb 0%, #0891b2 100%);
         color: #fff;
         text-align: center;
-        font-family:
-            Inter,
-            -apple-system,
-            Roboto,
-            Helvetica,
-            sans-serif;
+        
         font-size: 16px;
         font-weight: 600;
         line-height: normal;
@@ -288,12 +261,7 @@ export const StyleLiveDemo = styled.section`
     .feature-title {
         margin: 0;
         color: #fff;
-        font-family:
-            Inter,
-            -apple-system,
-            Roboto,
-            Helvetica,
-            sans-serif;
+        
         font-size: 18px;
         font-weight: 600;
         line-height: 28px;
@@ -302,43 +270,19 @@ export const StyleLiveDemo = styled.section`
     .feature-description {
         margin: 0;
         color: #94a3b8;
-        font-family:
-            Inter,
-            -apple-system,
-            Roboto,
-            Helvetica,
-            sans-serif;
+        
         font-size: 14px;
         font-weight: 400;
         line-height: 20px;
     }
 
     @media (max-width: 1200px) {
-
-        .demo-container {
-            padding: 0 32px;
-        }
-
-        .demo-header {
-            padding: 0 64px;
+        .demo-content {
+            padding: 80px 60px;
         }
     }
 
     @media (max-width: 1024px) {
-        padding: 64px 32px;
-
-        .demo-container {
-            padding: 0 16px;
-        }
-
-        .demo-content {
-            gap: 48px;
-        }
-
-        .demo-header {
-            padding: 0 32px;
-        }
-
         .demo-title {
             font-size: 40px;
             line-height: 40px;
@@ -348,10 +292,14 @@ export const StyleLiveDemo = styled.section`
             font-size: 18px;
             line-height: 26px;
         }
+
+        .demo-content {
+            gap: 48px;
+            padding: 64px 40px;
+        }
     }
 
     @media (max-width: 768px) {
-        padding: 48px 24px;
 
         .demo-container {
             padding: 0;
@@ -359,10 +307,7 @@ export const StyleLiveDemo = styled.section`
 
         .demo-content {
             gap: 32px;
-        }
-
-        .demo-header {
-            padding: 0 16px;
+            padding: 48px 24px;
         }
 
         .demo-title {
@@ -384,7 +329,7 @@ export const StyleLiveDemo = styled.section`
         }
 
         .feature-cards {
-            flex-direction: column;
+            flex-wrap:wrap;
             gap: 32px;
         }
 
@@ -393,16 +338,21 @@ export const StyleLiveDemo = styled.section`
         }
     }
 
-    @media (max-width: 480px) {
-        padding: 40px 16px;
-
-        .demo-header {
-            padding: 0;
+    @media (max-width: 640px) {
+        .demo-content {
+            padding: 40px 20px;
         }
+    }
+
+    @media (max-width: 480px) {
 
         .demo-title {
             font-size: 28px;
             line-height: 32px;
+        }
+
+        .demo-content{
+            padding: 32px 16px;
         }
 
         .demo-description {

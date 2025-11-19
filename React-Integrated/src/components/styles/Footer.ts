@@ -38,12 +38,7 @@ export const StyleFooter = styled.footer`
 
     .brand-name {
         color: #60a5fa;
-        font-family:
-            Inter,
-            -apple-system,
-            Roboto,
-            Helvetica,
-            sans-serif;
+        
         font-size: 18px;
         font-weight: 600;
         line-height: 28px;
@@ -60,12 +55,7 @@ export const StyleFooter = styled.footer`
     .copyright-text,
     .industry-text {
         color: #94a3b8;
-        font-family:
-            Inter,
-            -apple-system,
-            Roboto,
-            Helvetica,
-            sans-serif;
+        
         font-size: 14px;
         font-weight: 400;
         line-height: 20px;
@@ -73,28 +63,19 @@ export const StyleFooter = styled.footer`
 
     .separator {
         color: #94a3b8;
-        font-family:
-            Inter,
-            -apple-system,
-            Roboto,
-            Helvetica,
-            sans-serif;
+        
         font-size: 14px;
         font-weight: 400;
         line-height: 20px;
     }
 
-    @media (max-width: 1024px) {
-        padding: 40px 60px;
-    }
-
     @media (max-width: 768px) {
-        padding: 36px 40px;
 
         .footer-content {
             flex-direction: column;
             gap: 20px;
             text-align: center;
+            padding: 40px 50px;
         }
 
         .brand-section {
@@ -107,7 +88,10 @@ export const StyleFooter = styled.footer`
     }
 
     @media (max-width: 640px) {
-        padding: 32px 32px;
+
+        .footer-content {
+            padding: 32px 30px;
+        }
 
         .brand-name {
             font-size: 17px;
@@ -124,7 +108,6 @@ export const StyleFooter = styled.footer`
     }
 
     @media (max-width: 480px) {
-        padding: 28px 24px;
 
         .brand-name {
             font-size: 16px;
@@ -142,17 +125,31 @@ export const StyleFooter = styled.footer`
         }
 
         .footer-info {
-            flex-direction: column;
             gap: 8px;
-        }
-
-        .separator {
-            display: none;
         }
 
         .copyright-text,
         .industry-text {
             font-size: 12px;
         }
+
+        .footer-content {
+            padding: 24px 10px;
+        }
     }
+
+    @media (max-width: 365px) {
+        .separator{
+            display: none;
+        }
+        .industry-text {
+            display: none;
+        }
+        .footer-content{
+            gap: 12px;
+            padding: 20px 10px;
+        }
+    }
+
+
 `;

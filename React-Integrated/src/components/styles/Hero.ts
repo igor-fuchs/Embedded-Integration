@@ -134,12 +134,7 @@ export const StyleHero = styled.section`
 
     .status-text {
         color: #cbd5e1;
-        font-family:
-            Inter,
-            -apple-system,
-            Roboto,
-            Helvetica,
-            sans-serif;
+        
         font-size: 14px;
         font-weight: 400;
         line-height: normal;
@@ -147,12 +142,7 @@ export const StyleHero = styled.section`
 
     .hero-title {
         margin: 0;
-        font-family:
-            Inter,
-            -apple-system,
-            Roboto,
-            Helvetica,
-            sans-serif;
+        
         font-size: 72px;
         font-weight: 700;
         line-height: 72px;
@@ -169,12 +159,7 @@ export const StyleHero = styled.section`
     .hero-subtitle {
         margin: 0;
         color: #cbd5e1;
-        font-family:
-            Inter,
-            -apple-system,
-            Roboto,
-            Helvetica,
-            sans-serif;
+        
         font-size: 24px;
         font-weight: 400;
         line-height: 32px;
@@ -201,19 +186,14 @@ export const StyleHero = styled.section`
         gap: 8px;
         padding: 19px 28px;
         border-radius: 12px;
-        font-family:
-            Inter,
-            -apple-system,
-            Roboto,
-            Helvetica,
-            sans-serif;
+        
         font-size: 18px;
         font-weight: 600;
         line-height: normal;
         cursor: pointer;
         transition: all 0.3s ease;
 
-        svg {
+        img {
             width: 16px;
             height: 18px;
             flex-shrink: 0;
@@ -255,7 +235,7 @@ export const StyleHero = styled.section`
         margin-top: 2rem;
         animation: bounce 2s ease-in-out infinite;
 
-        svg {
+        img {
             width: 24px;
             height: 24px;
         }
@@ -312,7 +292,7 @@ export const StyleHero = styled.section`
             padding: 16px 24px;
             font-size: 16px;
 
-            svg {
+            img {
                 width: 14px;
                 height: 16px;
             }

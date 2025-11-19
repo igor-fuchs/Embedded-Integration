@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 export const StyleAbout = styled.section`
     width: 100%;
-    height: calc(100vh - var(--header-height)); // Adjust for header height
+    min-height: calc(100vh - var(--header-height)); // Adjust for header height
     background: #0f172a;
     display: flex;
     justify-content: center;
@@ -17,6 +17,7 @@ export const StyleAbout = styled.section`
     }
 
     .about-content {
+        padding: 60px 40px;
         width: 100%;
         max-width: 1152px;
         display: flex;
@@ -39,12 +40,6 @@ export const StyleAbout = styled.section`
         margin: 0;
         color: #fff;
         text-align: center;
-        font-family:
-            Inter,
-            -apple-system,
-            Roboto,
-            Helvetica,
-            sans-serif;
         font-size: 48px;
         font-weight: 700;
         line-height: 48px;
@@ -54,12 +49,7 @@ export const StyleAbout = styled.section`
         margin: 0;
         color: #94a3b8;
         text-align: center;
-        font-family:
-            Inter,
-            -apple-system,
-            Roboto,
-            Helvetica,
-            sans-serif;
+
         font-size: 20px;
         font-weight: 400;
         line-height: 28px;
@@ -145,12 +135,7 @@ export const StyleAbout = styled.section`
     .feature-title {
         margin: 0;
         color: #fff;
-        font-family:
-            Inter,
-            -apple-system,
-            Roboto,
-            Helvetica,
-            sans-serif;
+        
         font-size: 20px;
         font-weight: 600;
         line-height: 28px;
@@ -159,12 +144,7 @@ export const StyleAbout = styled.section`
     .feature-description {
         margin: 0;
         color: #cbd5e1;
-        font-family:
-            Inter,
-            -apple-system,
-            Roboto,
-            Helvetica,
-            sans-serif;
+        
         font-size: 16px;
         font-weight: 400;
         line-height: 26px;
@@ -214,12 +194,7 @@ export const StyleAbout = styled.section`
     }
 
     .flow-label {
-        font-family:
-            Inter,
-            -apple-system,
-            Roboto,
-            Helvetica,
-            sans-serif;
+        
         font-size: 16px;
         font-weight: 600;
         line-height: 24px;
@@ -268,12 +243,7 @@ export const StyleAbout = styled.section`
         margin: 0;
         color: #cbd5e1;
         text-align: center;
-        font-family:
-            Inter,
-            -apple-system,
-            Roboto,
-            Helvetica,
-            sans-serif;
+        
         font-size: 16px;
         font-weight: 400;
         line-height: 24px;
@@ -317,19 +287,18 @@ export const StyleAbout = styled.section`
     .status-text {
         color: #94a3b8;
         text-align: center;
-        font-family:
-            Inter,
-            -apple-system,
-            Roboto,
-            Helvetica,
-            sans-serif;
+        
         font-size: 12px;
         font-weight: 400;
         line-height: 16px;
     }
 
     @media (max-width: 1200px) {
-        padding: 60px 40px;
+
+        .about-content {
+            padding: 80px 60px;
+        }
+
         .about-grid {
             flex-direction: column;
             gap: 32px;
@@ -346,6 +315,7 @@ export const StyleAbout = styled.section`
 
         .about-content {
             gap: 48px;
+            padding: 48px 24px;
         }
 
         .about-title {
@@ -400,10 +370,10 @@ export const StyleAbout = styled.section`
     }
 
     @media (max-width: 640px) {
-        padding: 40px 20px;
 
         .about-content {
             gap: 32px;
+            padding: 40px 20px;
         }
 
         .about-title {
@@ -442,7 +412,10 @@ export const StyleAbout = styled.section`
     }
 
     @media (max-width: 480px) {
-        padding: 32px 16px;
+
+        .about-content {
+            padding: 32px 16px;
+        }
 
         .about-title {
             font-size: 24px;
