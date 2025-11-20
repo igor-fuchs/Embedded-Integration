@@ -8,14 +8,13 @@ import LanguageSelector from "./LanguageSelector";
 export default function Header() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const mobileMenuRef = useRef<HTMLDivElement | null>(null);
-    const menuIconRef = useRef<HTMLDivElement | null>(null);
 
     const toggleMobileMenu = () => {
         setIsMobileMenuOpen(!isMobileMenuOpen);
     };
 
     // Close the menu when clicking/tapping outside (but not on menu icon)
-    useOnClickOutside(mobileMenuRef, () => setIsMobileMenuOpen(false), [menuIconRef]);
+    useOnClickOutside(mobileMenuRef, () => setIsMobileMenuOpen(false));
 
     return (
         <StyleHeader>
@@ -48,27 +47,28 @@ export default function Header() {
                             <LanguageSelector />
                         </div>
                     </div>
+
                     {/* Nav links - Version Mobile */}
-                    <div className="mobile-menu-icon" onClick={toggleMobileMenu} ref={menuIconRef}>
+                    <div className="mobile-menu-icon" onClick={toggleMobileMenu} ref={mobileMenuRef}>
                         <img src={MenuBarIcon} alt="Menu" />
+                        {isMobileMenuOpen && (
+                            <div className="mobile-menu">
+                                <div className="mobile-nav-link" onClick={toggleMobileMenu}>
+                                    <div className="mobile-nav-text">About</div>
+                                </div>
+                                <div className="mobile-nav-link" onClick={toggleMobileMenu}>
+                                    <div className="mobile-nav-text">Technologies</div>
+                                </div>
+                                <div className="mobile-nav-link" onClick={toggleMobileMenu}>
+                                    <div className="mobile-nav-text">Demo</div>
+                                </div>
+                                <div className="mobile-nav-link" onClick={toggleMobileMenu}>
+                                    <div className="mobile-nav-text">Contact</div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
-                {isMobileMenuOpen && (
-                    <div className="mobile-menu" ref={mobileMenuRef}>
-                        <div className="mobile-nav-link" onClick={toggleMobileMenu}>
-                            <div className="mobile-nav-text">About</div>
-                        </div>
-                        <div className="mobile-nav-link" onClick={toggleMobileMenu}>
-                            <div className="mobile-nav-text">Technologies</div>
-                        </div>
-                        <div className="mobile-nav-link" onClick={toggleMobileMenu}>
-                            <div className="mobile-nav-text">Demo</div>
-                        </div>
-                        <div className="mobile-nav-link" onClick={toggleMobileMenu}>
-                            <div className="mobile-nav-text">Contact</div>
-                        </div>
-                    </div>
-                )}
             </nav>
         </StyleHeader>
     )
