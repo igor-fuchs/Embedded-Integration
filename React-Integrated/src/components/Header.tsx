@@ -8,13 +8,14 @@ import LanguageSelector from "./LanguageSelector";
 export default function Header() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const mobileMenuRef = useRef<HTMLDivElement | null>(null);
+    const menuIconRef = useRef<HTMLDivElement | null>(null);
 
     const toggleMobileMenu = () => {
         setIsMobileMenuOpen(!isMobileMenuOpen);
     };
 
-    // Close the menu when clicking/tapping outside
-    useOnClickOutside(mobileMenuRef, toggleMobileMenu);
+    // Close the menu when clicking/tapping outside (but not on menu icon)
+    useOnClickOutside(mobileMenuRef, () => setIsMobileMenuOpen(false), [menuIconRef]);
 
     return (
         <StyleHeader>
@@ -48,7 +49,7 @@ export default function Header() {
                         </div>
                     </div>
                     {/* Nav links - Version Mobile */}
-                    <div className="mobile-menu-icon" onClick={toggleMobileMenu}>
+                    <div className="mobile-menu-icon" onClick={toggleMobileMenu} ref={menuIconRef}>
                         <img src={MenuBarIcon} alt="Menu" />
                     </div>
                 </div>

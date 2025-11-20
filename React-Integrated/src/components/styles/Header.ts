@@ -146,12 +146,22 @@ export const StyleHeader = styled.header`
             gap: 16px;
         }
 
-        .nav-text {
+        .nav-text, .language-selector-text {
             font-size: 14px;
+        }
+
+        .web-icon{
+            width: 14px;
+            height: 14px;
+        }
+
+        .arrow-icon{
+            width: 10.5px;
+            height: 6px;
         }
     }
 
-    @media (max-width: 520px) {
+    @media (max-width: 620px) {
         .nav-links {
             display: none;
         }
