@@ -2,6 +2,7 @@ import { StyleAbout } from "./styles/About";
 import IndustrialIcon from "../assets/icons/industrial-icon.svg";
 import WebInterfaceIcon from "../assets/icons/web-interface-icon.svg";
 import logo from '../assets/logo.svg';
+import StatusIndicator from "./StatusIndicator";
 
 export default function About() {
     return (
@@ -64,15 +65,15 @@ export default function About() {
 
                                     <div className="status-indicators">
                                         <div className="status-item">
-                                            <div className="status-dot simulation"></div>
+                                            <StatusIndicator id="Simulation" status={true} colorOn="#4ade80" colorOff="#f70000" />
                                             <span className="status-text">Simulation</span>
                                         </div>
                                         <div className="status-item">
-                                            <div className="status-dot processing"></div>
+                                            <StatusIndicator id="Processing" status={true} colorOn="#facc15" colorOff="#f70000" />
                                             <span className="status-text">Processing</span>
                                         </div>
                                         <div className="status-item">
-                                            <div className="status-dot interface"></div>
+                                            <StatusIndicator id="Interface" status={true} colorOn="#60a5fa" colorOff="#f70000" />
                                             <span className="status-text">Interface</span>
                                         </div>
                                     </div>

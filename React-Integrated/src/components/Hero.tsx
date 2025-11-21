@@ -1,4 +1,5 @@
 import { StyleHero } from "./styles/Hero";
+import StatusIndicator from "./StatusIndicator";
 import PlayButtonIcon from '../assets/icons/play-button-icon.svg';
 import GithubIcon from '../assets/icons/github-icon.svg';
 import ArrowIcon from "../assets/icons/arrow-icon.svg";
@@ -17,8 +18,8 @@ export default function Hero() {
             </div>
             
             <div className="hero-content">
-                <div className="status-badge">
-                    <div className="status-indicator"></div>
+                <div className="status-badge" >
+                    <StatusIndicator id="System" status={true} colorOn="#4ade80" colorOff="#f70000" />
                     <span className="status-text">System Online</span>
                 </div>
                 

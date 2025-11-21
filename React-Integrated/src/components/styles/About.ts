@@ -266,24 +266,6 @@ export const StyleAbout = styled.section`
         gap: 14px;
     }
 
-    .status-dot {
-        width: 12px;
-        height: 12px;
-        border-radius: 9999px;
-
-        &.simulation {
-            background: #4ade80;
-        }
-
-        &.processing {
-            background: #facc15;
-        }
-
-        &.interface {
-            background: #60a5fa;
-        }
-    }
-
     .status-text {
         color: #94a3b8;
         text-align: center;

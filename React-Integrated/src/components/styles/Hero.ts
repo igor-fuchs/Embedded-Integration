@@ -111,27 +111,6 @@ export const StyleHero = styled.section`
         backdrop-filter: blur(10px);
     }
 
-    .status-indicator {
-        width: 8px;
-        height: 8px;
-        border-radius: 9999px;
-        background: #4ade80;
-        opacity: 0.9988;
-        animation: pulse 2s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-        0%,
-        100% {
-            opacity: 1;
-            box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7);
-        }
-        50% {
-            opacity: 0.8;
-            box-shadow: 0 0 0 8px rgba(74, 222, 128, 0);
-        }
-    }
-
     .status-text {
         color: #cbd5e1;
         
