@@ -74,6 +74,49 @@ export const StyleAbout = styled.section`
         max-width: 552px;
     }
 
+    .features-column.animate .feature-card {
+        animation: slideInFromLeft 1s ease-out forwards;
+    }
+
+    .diagram-column.animate .diagram-card {
+        animation: slideInFromRight 1s ease-out forwards;
+        @media(max-width: 1200px) {
+            animation: slideInFromLeft 1s ease-out forwards;
+        }
+    }
+
+    .diagram-column.animate .features-column.animate {
+        animation-delay: 0.1s;
+    }
+
+    .diagram-column.animate .features-column.animate {
+        animation-delay: 0.3s;
+    }
+
+    
+
+    @keyframes slideInFromLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-100px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes slideInFromRight {
+        from {
+            opacity: 0;
+            transform: translateX(100px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
     .feature-card {
         display: flex;
         padding: 33px;
@@ -83,6 +126,8 @@ export const StyleAbout = styled.section`
         border: 1px solid #334155;
         background: rgba(30, 41, 59, 0.5);
         transition: all 0.3s ease;
+        opacity: 0;
+        transform: translateX(-100px);
 
         &:hover {
             border-color: #475569;
@@ -169,6 +214,7 @@ export const StyleAbout = styled.section`
         border: 1px solid #334155;
         background: rgba(30, 41, 59, 0.3);
         transition: all 0.3s ease;
+        opacity: 0;
 
         &:hover {
             border-color: #475569;
@@ -211,8 +257,18 @@ export const StyleAbout = styled.section`
     .flow-line {
         flex: 1;
         height: 2px;
+        position: relative;
+        border-radius: 2px;
+        overflow: hidden;
         background: linear-gradient(90deg, #60a5fa 0%, #22d3ee 100%);
+        background-size: 200% 100%;
+        animation: flowMove 2.8s linear infinite;
     }
+
+    @keyframes flowMove {
+        0% { background-position: -0% -50%; }
+        100% { background-position: -200% -50%; }
+    } 
 
     .central-icon-wrapper {
         width: 100%;

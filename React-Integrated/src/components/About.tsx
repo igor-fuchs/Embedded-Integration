@@ -3,8 +3,38 @@ import IndustrialIcon from "../assets/icons/industrial-icon.svg";
 import WebInterfaceIcon from "../assets/icons/web-interface-icon.svg";
 import logo from '../assets/logo.svg';
 import StatusIndicator from "./StatusIndicator";
+import { useEffect, useRef, useState } from "react";
 
 export default function About() {
+    const gridRef = useRef<HTMLDivElement>(null);
+    const [isVisibleGrid, setIsVisibleGrid] = useState(false);
+
+    useEffect(() => {
+        // Look for the element if it is in the viewport
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting && !isVisibleGrid) {
+                    setIsVisibleGrid(true);
+                }
+            },
+            {
+                threshold: 0.2,
+                rootMargin: "0px"
+            }
+        );
+
+        if (gridRef.current) {
+            observer.observe(gridRef.current);
+        }
+        
+        // Cleanup function - works after to generate the element once time and it appears in the screen
+        return () => {
+            if (gridRef.current) {
+                observer.unobserve(gridRef.current);
+            }
+        };
+    }, [isVisibleGrid]);
+
     return (
         <StyleAbout id="About">
             <div className="about-container">
@@ -16,8 +46,8 @@ export default function About() {
                         </p>
                     </div>
 
-                    <div className="about-grid">
-                        <div className="features-column">
+                    <div className="about-grid" ref={gridRef}>
+                        <div className={`features-column ${isVisibleGrid ? 'animate' : ''}`}>
                             <div className="feature-card">
                                 <div className="feature-content">
                                     <div className="feature-icon industrial">
@@ -47,7 +77,7 @@ export default function About() {
                             </div>
                         </div>
 
-                        <div className="diagram-column">
+                        <div className={`diagram-column ${isVisibleGrid ? 'animate' : ''}`}>
                             <div className="diagram-card">
                                 <div className="diagram-content">
                                     <div className="flow-header">
