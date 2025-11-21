@@ -1,97 +1,67 @@
 import { StyleTechnologies } from "./styles/Technologies";
-import IndustrialIcon from '../assets/icons/industrial-icon.svg';
-import Logo from '../assets/logo.svg';
-import ReactIcon from '../assets/icons/react-icon.svg';
-import DotNetIcon from '../assets/icons/dotnet-icon.png';
-import ConfigIcon from '../assets/icons/config-icon.svg';
-import PaintIcon from '../assets/icons/paint-icon.svg';
+import { listCards } from "./lib/TechnologiesLib";
 import { useRef, useState, useEffect } from "react";
 
 export default function Technologies() {
-    const gridRef = useRef<HTMLDivElement>(null);
+    // Bug
+    // Se eu segurar o drag por muito tempo e soltar, o auto scroll reinicia e para logo em seguida.
+
+    // Okay code
+    const cards = listCards;
+    const inactivityTimer = useRef<number | null>(null);
+    const [autoScroll, setAutoScroll] = useState(true);
+
+    // Checking
+    const scrollRef = useRef<HTMLDivElement>(null);
     const [isDragging, setIsDragging] = useState(false);
     const [startX, setStartX] = useState(0);
     const [scrollLeft, setScrollLeft] = useState(0);
     const [velocity, setVelocity] = useState(0);
     const [lastX, setLastX] = useState(0);
     const [lastTime, setLastTime] = useState(0);
-    const [autoScroll, setAutoScroll] = useState(true); // mantém ativo desde o início
-    const inactivityTimerRef = useRef<number | null>(null);
     const contentWidthRef = useRef<number>(0);
 
-    const cards = [
-        {
-            key: 'factory-io',
-            iconClass: 'factory-io',
-            icon: IndustrialIcon,
-            title: 'Factory IO',
-            description: '3D factory simulation platform providing realistic industrial automation scenarios and equipment modeling.'
-        },
-        {
-            key: 'tia-portal',
-            iconClass: 'tia-portal',
-            icon: Logo,
-            title: 'TIA Portal',
-            description: 'Siemens engineering framework for PLC programming, HMI development, and industrial automation control.'
-        },
-        {
-            key: 'react',
-            iconClass: 'react',
-            icon: ReactIcon,
-            title: 'React',
-            description: 'Modern JavaScript library for building responsive user interfaces and real-time data visualization dashboards.'
-        },
-        {
-            key: 'dotnet',
-            iconClass: 'dotnet',
-            icon: DotNetIcon,
-            title: '.NET',
-            description: 'Server-side runtime enabling real-time communication and data processing between systems.'
-        },
-        {
-            key: 'protocols',
-            iconClass: 'siemens-plc',
-            icon: ConfigIcon,
-            title: 'Communication Protocols',
-            description: 'OPC UA and HTTP enabling communication between industrial devices and services.'
-        },
-        {
-            key: 'pixel-art',
-            iconClass: 'pixel-art',
-            icon: PaintIcon,
-            title: 'Pixel Art',
-            description: 'Custom animated pixel art visualizations bringing factory operations to life in a unique artistic style.'
-        }
-    ];
-
+    // Okay code
     const resetInactivityTimer = () => {
-        if (inactivityTimerRef.current) {
-            clearTimeout(inactivityTimerRef.current);
+        if (inactivityTimer.current) {
+            clearTimeout(inactivityTimer.current);
         }
         setAutoScroll(false);
-        inactivityTimerRef.current = window.setTimeout(() => {
+        inactivityTimer.current = window.setTimeout(() => {
             setAutoScroll(true);
         }, 3000);
     };
 
+
+    // Checking
+
+    useEffect(() => {
+        if (scrollRef.current) {
+            contentWidthRef.current = scrollRef.current.scrollWidth / 2;
+        }
+    }, []);
+
     const handleMouseDown = (e: React.MouseEvent) => {
-        if (!gridRef.current) return;
+        if (!scrollRef.current) return; // Avoid errors if the element is not ready
         resetInactivityTimer();
         setIsDragging(true);
-        setStartX(e.pageX - gridRef.current.offsetLeft);
-        setScrollLeft(gridRef.current.scrollLeft);
+        setStartX(e.pageX - scrollRef.current.offsetLeft);
+        setScrollLeft(scrollRef.current.scrollLeft);
         setLastX(e.pageX);
         setLastTime(Date.now());
         setVelocity(0);
     };
 
     const handleMouseMove = (e: React.MouseEvent) => {
-        if (!isDragging || !gridRef.current) return;
-        e.preventDefault();
-        const x = e.pageX - gridRef.current.offsetLeft;
-        const walk = (x - startX) * 1.5;
-        gridRef.current.scrollLeft = scrollLeft - walk;
+        if (!isDragging || !scrollRef.current) return;
+        e.preventDefault(); // Avoid unwanted selections
 
+        // Calculate the new scroll position based on mouse movement
+        const x = e.pageX - scrollRef.current.offsetLeft;
+        const walk = (x - startX) * 1.5;
+        scrollRef.current.scrollLeft = scrollLeft - walk;
+
+        // Calculate velocity for momentum using time difference between drag events
         const currentTime = Date.now();
         const timeDiff = currentTime - lastTime;
         if (timeDiff > 0) {
@@ -100,54 +70,84 @@ export default function Technologies() {
         }
         setLastX(e.pageX);
         setLastTime(currentTime);
-
-        // Wrap-around during drag
-        const contentWidth = contentWidthRef.current;
-        if (contentWidth > 0) {
-            if (gridRef.current.scrollLeft >= contentWidth) {
-                gridRef.current.scrollLeft -= contentWidth;
-            } else if (gridRef.current.scrollLeft <= 0) {
-                gridRef.current.scrollLeft += contentWidth;
-            }
-        }
     };
 
     const handleMouseUp = () => {
         setIsDragging(false);
-        resetInactivityTimer();
     };
 
     const handleMouseLeave = () => {
-        setIsDragging(false);
-        resetInactivityTimer();
+        if (isDragging) {
+            setIsDragging(false);
+        }
     };
 
+    // // Touch handlers for mobile
+    // const handleTouchStart = (e: React.TouchEvent) => {
+    //     if (!scrollRef.current) return;
+    //     resetInactivityTimer();
+    //     setIsDragging(true);
+    //     const touch = e.touches[0];
+    //     setStartX(touch.pageX - scrollRef.current.offsetLeft);
+    //     setScrollLeft(scrollRef.current.scrollLeft);
+    //     setLastX(touch.pageX);
+    //     setLastTime(Date.now());
+    //     setVelocity(0);
+    // };
+
+    // const handleTouchMove = (e: React.TouchEvent) => {
+    //     if (!isDragging || !scrollRef.current) return;
+    //     const touch = e.touches[0];
+    //     const x = touch.pageX - scrollRef.current.offsetLeft;
+    //     const walk = (x - startX) * 1.5;
+    //     scrollRef.current.scrollLeft = scrollLeft - walk;
+
+    //     const currentTime = Date.now();
+    //     const timeDiff = currentTime - lastTime;
+    //     if (timeDiff > 0) {
+    //         const newVelocity = (touch.pageX - lastX) / timeDiff;
+    //         setVelocity(newVelocity);
+    //     }
+    //     setLastX(touch.pageX);
+    //     setLastTime(currentTime);
+
+    //     // Wrap-around during drag
+    //     const contentWidth = contentWidthRef.current;
+    //     if (contentWidth > 0) {
+    //         if (scrollRef.current.scrollLeft >= contentWidth) {
+    //             scrollRef.current.scrollLeft -= contentWidth;
+    //         } else if (scrollRef.current.scrollLeft <= 0) {
+    //             scrollRef.current.scrollLeft += contentWidth;
+    //         }
+    //     }
+    // };
+
+    // const handleTouchEnd = () => {
+    //     setIsDragging(false);
+    //     resetInactivityTimer();
+    // };
+
     // Initial measurement of content width (original set of cards)
-    useEffect(() => {
-        if (gridRef.current) {
-            // Each card has fixed width, but we rely on scrollWidth/2 due to duplication
-            contentWidthRef.current = gridRef.current.scrollWidth / 2;
-        }
-    }, []);
+
 
     // Momentum after drag release
     useEffect(() => {
-        if (!isDragging && Math.abs(velocity) > 0.1 && gridRef.current) {
+        if (!isDragging && Math.abs(velocity) > 0.1 && scrollRef.current) {
             let currentVelocity = velocity * 16; // scale
             const decay = 0.95;
             const step = () => {
-                if (!gridRef.current) return;
+                if (!scrollRef.current) return;
                 if (Math.abs(currentVelocity) < 0.5) return;
-                gridRef.current.scrollLeft -= currentVelocity;
+                scrollRef.current.scrollLeft -= currentVelocity;
                 currentVelocity *= decay;
 
                 // Wrap-around
                 const contentWidth = contentWidthRef.current;
                 if (contentWidth > 0) {
-                    if (gridRef.current.scrollLeft >= contentWidth) {
-                        gridRef.current.scrollLeft -= contentWidth;
-                    } else if (gridRef.current.scrollLeft <= 0) {
-                        gridRef.current.scrollLeft += contentWidth;
+                    if (scrollRef.current.scrollLeft >= contentWidth) {
+                        scrollRef.current.scrollLeft -= contentWidth;
+                    } else if (scrollRef.current.scrollLeft <= 0) {
+                        scrollRef.current.scrollLeft += contentWidth;
                     }
                 }
                 requestAnimationFrame(step);
@@ -162,14 +162,17 @@ export default function Technologies() {
         let rafId: number;
         const speed = 0.8; // velocidade um pouco maior para ficar visível
         const autoStep = () => {
-            if (!gridRef.current) return;
-            gridRef.current.scrollLeft += speed;
+            if (!scrollRef.current) return;
+            scrollRef.current.scrollLeft += speed;
             const contentWidth = contentWidthRef.current;
+            // console.log("CONTENT WIDTH:", contentWidth);
+            // console.log("SCROLL LEFT:", scrollRef.current.scrollLeft);
             if (contentWidth > 0) {
-                if (gridRef.current.scrollLeft >= contentWidth) {
-                    gridRef.current.scrollLeft -= contentWidth;
-                } else if (gridRef.current.scrollLeft <= 0) {
-                    gridRef.current.scrollLeft += contentWidth;
+                if (scrollRef.current.scrollLeft >= contentWidth) {
+                    scrollRef.current.scrollLeft -= contentWidth;
+                } else if (scrollRef.current.scrollLeft <= 0) {
+                    // console.log("HERE");
+                    scrollRef.current.scrollLeft += (contentWidth - 100);
                 }
             }
             rafId = requestAnimationFrame(autoStep);
@@ -177,8 +180,6 @@ export default function Technologies() {
         rafId = requestAnimationFrame(autoStep);
         return () => cancelAnimationFrame(rafId);
     }, [autoScroll, isDragging]);
-
-    // Removido controle de setas
 
     return (
         <StyleTechnologies id="Technologies">
@@ -191,24 +192,29 @@ export default function Technologies() {
                         </p>
                     </div>
 
-                    <div 
-                        className="technologies-grid"
-                        ref={gridRef}
-                        onMouseDown={handleMouseDown}
-                        onMouseMove={handleMouseMove}
-                        onMouseUp={handleMouseUp}
-                        onMouseLeave={handleMouseLeave}
-                    >
-                        <div className="technologies-track">
-                            {cards.concat(cards).map((c, idx) => (
-                                <div key={c.key + '-' + idx} className="tech-card">
-                                    <div className={`tech-icon ${c.iconClass}`}> 
-                                        <img src={c.icon} alt={c.title} {...(c.key === 'tia-portal' ? { width: 22, height: 22 } : {})} />
+                    <div className="technologies-grid">
+                        <div
+                            className="technologies-scroll"
+                            ref={scrollRef}
+                            onMouseDown={handleMouseDown}
+                            onMouseMove={handleMouseMove}
+                            onMouseUp={handleMouseUp}
+                            onMouseLeave={handleMouseLeave}
+                        // onTouchStart={handleTouchStart}
+                        // onTouchMove={handleTouchMove}
+                        // onTouchEnd={handleTouchEnd}
+                        >
+                            <div className="technologies-track">
+                                {cards.concat(cards).map((c, idx) => (
+                                    <div key={c.key + '-' + idx} className="tech-card">
+                                        <div className={`tech-icon ${c.iconClass}`}>
+                                            <img src={c.icon} alt={c.title} {...(c.key === 'tia-portal' ? { width: 22, height: 22 } : {})} />
+                                        </div>
+                                        <h3 className="tech-title">{c.title}</h3>
+                                        <p className="tech-description">{c.description}</p>
                                     </div>
-                                    <h3 className="tech-title">{c.title}</h3>
-                                    <p className="tech-description">{c.description}</p>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>

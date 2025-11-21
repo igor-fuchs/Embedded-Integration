@@ -59,10 +59,36 @@ export const StyleTechnologies = styled.section`
 
     .technologies-grid {
         width: 100%;
+        position: relative;
+        overflow: hidden;
+
+        &::before,
+        &::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 80px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        &::before {
+            left: 0;
+            background: linear-gradient(to right, #020617 0%, rgba(2, 6, 23, 0.85) 40%, rgba(2, 6, 23, 0) 100%);
+        }
+
+        &::after {
+            right: 0;
+            background: linear-gradient(to left, #020617 0%, rgba(2, 6, 23, 0.85) 40%, rgba(2, 6, 23, 0) 100%);
+        }
+    }
+
+    .technologies-scroll {
+        width: 100%;
         overflow-x: hidden;
         cursor: grab;
         user-select: none;
-        position: relative;
         
         &:active {
             cursor: grabbing;
@@ -75,6 +101,8 @@ export const StyleTechnologies = styled.section`
         padding: 8px;
         transition: transform 0.1s ease-out;
         will-change: transform;
+        position: relative;
+        z-index: 0;
     }
 
     .tech-card {
