@@ -72,7 +72,7 @@ export default function Header() {
 
                     {/* Nav links - Version Mobile */}
                     <div className="mobile-menu-icon" ref={mobileMenuRef} onClick={toggleMobileMenu} >
-                        <img src={MenuBarIcon} alt="Menu" />
+                        <img src={MenuBarIcon} alt="Menu" style={{filter: "invert(1)"}} />
                         {isMobileMenuOpen && (
                             <div className="mobile-menu">
                                 <MenuAndLanguageSelector

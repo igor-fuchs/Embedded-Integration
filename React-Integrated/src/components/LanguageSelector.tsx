@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import i18n, { languagesAvailable as languages } from "../util/translation";
-import { StyleLanguageSelector, StyleDropdownMenu, StyleDropDownItem } from "./styles/LanguageSelector"
+import { StyleLanguageSelector, StyleDropdownMenu, StyleDropDownItem } from "./styles/MenuAndLanguageSelector"
 import useOnClickOutside from "../hooks/useOnClickOutside";
 import WebInterfaceIcon from "../assets/icons/web-interface-icon.svg?react";
 import ArrowIcon from "../assets/icons/arrow-icon-header.svg?react";

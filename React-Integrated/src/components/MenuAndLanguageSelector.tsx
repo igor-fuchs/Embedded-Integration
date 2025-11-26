@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import i18n, { languagesAvailable } from "../util/translation";
-import { StyleLanguageSelector, StyleDropdownMenu, StyleDropDownItem } from "./styles/LanguageSelector";
+import { StyleLanguageSelector, StyleDropdownMenu, StyleDropDownItem } from "./styles/MenuAndLanguageSelector";
 import useOnClickOutside from "../hooks/useOnClickOutside";
 import WebInterfaceIcon from "../assets/icons/web-interface-icon.svg?react";
 import ArrowIcon from "../assets/icons/arrow-icon-header.svg?react";
@@ -16,8 +16,8 @@ interface MenuAndLanguageSelectorProps {
     isMobile?: boolean;
 }
 
-export default function MenuAndLanguageSelector({ 
-    menuItems = [], 
+export default function MenuAndLanguageSelector({
+    menuItems = [],
     isMobile = false,
 }: MenuAndLanguageSelectorProps) {
     const { t } = useTranslation();
@@ -58,15 +58,36 @@ export default function MenuAndLanguageSelector({
     // Close dropdown when clicking outside (desktop)
     useOnClickOutside(
         dropdownRef,
-        () => {
-            setIsOpen(false);
-        }
+        () => setIsOpen(false)
     );
 
     // Render as list (mobile menu)
     if (isMobile) {
+
+        // Show menu items + language selector button
+        if (!showLanguages) {
+            return (
+                <>
+                    {menuItems.map((item, index) => (
+                        <div key={index} className="mobile-nav-link" onClick={item.onClick}>
+                            <div className="mobile-nav-text">{item.label}</div>
+                        </div>
+                    ))}
+                    <div className="mobile-nav-link" onClick={handleLanguageSelectorClick}>
+                        <StyleLanguageSelector id="LanguageSelector" className="language-selector">
+                            <div className="language-selector-header">
+                                <WebInterfaceIcon className="web-icon" id="WebIcon" />
+                                <p className="language-selector-text" id="LanguageSelectorText">{currentLanguage.label}</p>
+                                <ArrowIcon className="arrow-icon" id="ArrowIcon" />
+                            </div>
+                        </StyleLanguageSelector>
+                    </div>
+                </>
+            );
+        }
+
+        // Show languages available to selection
         if (showLanguages) {
-            // Show language options
             return (
                 <>
                     <div className="mobile-nav-link" onClick={handleBackClick}>
@@ -76,9 +97,7 @@ export default function MenuAndLanguageSelector({
                         <div
                             key={lang.code}
                             className="mobile-nav-link"
-                            onClick={(e) => {
-                                handleLanguageChange(lang.code);
-                            }}
+                            onClick={() => handleLanguageChange(lang.code)}
                         >
                             <img src={lang.flag} alt={lang.label} style={{ width: '24px', height: '16px', marginRight: '8px' }} />
                             <div className="mobile-nav-text">{lang.label}</div>
@@ -87,28 +106,6 @@ export default function MenuAndLanguageSelector({
                 </>
             );
         }
-
-        // Show menu items + language selector button
-        return (
-            <>
-                {menuItems.map((item, index) => (
-                    <div key={index} className="mobile-nav-link" onClick={item.onClick}>
-                        <div className="mobile-nav-text">{item.label}</div>
-                    </div>
-                ))}
-                <div className="mobile-nav-link" onClick={handleLanguageSelectorClick}>
-                    <StyleLanguageSelector id="LanguageSelector" className="language-selector">
-                        <div className="language-selector-header">
-                            <WebInterfaceIcon className="web-icon" id="WebIcon" />
-                            <p className="language-selector-text" id="LanguageSelectorText">{currentLanguage.label}</p>
-                            <ArrowIcon className="arrow-icon" id="ArrowIcon" />
-                        </div>
-                    </StyleLanguageSelector>
-                </div>
-            </>
-        );
-
-        
     }
 
     // Render as dropdown (desktop)

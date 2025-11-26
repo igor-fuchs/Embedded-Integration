@@ -86,7 +86,6 @@ export const StyleHeader = styled.header`
         img {
             width: 20px;
             height: 20px;
-            filter: invert(1);
         }
     }
 
