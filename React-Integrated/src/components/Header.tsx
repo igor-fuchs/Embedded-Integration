@@ -5,14 +5,36 @@ import useOnClickOutside from "../hooks/useOnClickOutside";
 import Logo from "../assets/logo.svg";
 import MenuBarIcon from "../assets/icons/menu-bar-icon.svg";
 import LanguageSelector from "./LanguageSelector";
+import { languagesAvailable } from "../util/translation";
+import i18n from "../util/translation";
 
 export default function Header() {
+    // transformar o language selector em um menu que pode ser incluido cabeçalhos(about, technologies, demo, contact)
+
     const { t } = useTranslation();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isLanguageSelectorOpen, setIsLanguageSelectorOpen] = useState(false);
     const mobileMenuRef = useRef<HTMLDivElement | null>(null);
 
     const toggleMobileMenu = () => {
         setIsMobileMenuOpen(!isMobileMenuOpen);
+        setIsLanguageSelectorOpen(false);
+    };
+
+    const handleLanguageChange = (langCode: string) => {
+        i18n.changeLanguage(langCode);
+        setIsLanguageSelectorOpen(false);
+        setIsMobileMenuOpen(false);
+    };
+
+    const handleLanguageSelectorClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setIsLanguageSelectorOpen(true);
+    };
+
+    const handleBackClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setIsLanguageSelectorOpen(false);
     };
 
     const scrollToSection = (sectionId: string) => {
@@ -73,18 +95,43 @@ export default function Header() {
                         <img src={MenuBarIcon} alt="Menu" />
                         {isMobileMenuOpen && (
                             <div className="mobile-menu">
-                                <div className="mobile-nav-link" onClick={() => scrollToSection('About')}>
-                                    <div className="mobile-nav-text">{t("About")}</div>
-                                </div>
-                                <div className="mobile-nav-link" onClick={() => scrollToSection('Technologies')}>
-                                    <div className="mobile-nav-text">{t("Technologies")}</div>
-                                </div>
-                                <div className="mobile-nav-link" onClick={() => scrollToSection('Demo')}>
-                                    <div className="mobile-nav-text">{t("Demo")}</div>
-                                </div>
-                                <div className="mobile-nav-link" onClick={() => scrollToSection('Contact')}>
-                                    <div className="mobile-nav-text">{t("Contact")}</div>
-                                </div>
+                                {!isLanguageSelectorOpen ? (
+                                    // Menu items padrão
+                                    <>
+                                        <div className="mobile-nav-link" onClick={() => scrollToSection('About')}>
+                                            <div className="mobile-nav-text">{t("About")}</div>
+                                        </div>
+                                        <div className="mobile-nav-link" onClick={() => scrollToSection('Technologies')}>
+                                            <div className="mobile-nav-text">{t("Technologies")}</div>
+                                        </div>
+                                        <div className="mobile-nav-link" onClick={() => scrollToSection('Demo')}>
+                                            <div className="mobile-nav-text">{t("Demo")}</div>
+                                        </div>
+                                        <div className="mobile-nav-link" onClick={() => scrollToSection('Contact')}>
+                                            <div className="mobile-nav-text">{t("Contact")}</div>
+                                        </div>
+                                        <div className="mobile-nav-link" onClick={handleLanguageSelectorClick}>
+                                            <LanguageSelector isMobile={true} isOpen={false} />
+                                        </div>
+                                    </>
+                                ) : (
+                                    // Lista de linguagens disponíveis
+                                    <>
+                                        <div className="mobile-nav-link" onClick={handleBackClick}>
+                                            <div className="mobile-nav-text">← {t("Back")}</div>
+                                        </div>
+                                        {languagesAvailable.map((lang) => (
+                                            <div
+                                                key={lang.code}
+                                                className="mobile-nav-link"
+                                                onClick={() => handleLanguageChange(lang.code)}
+                                            >
+                                                <img src={lang.flag} alt={lang.label} style={{ width: '24px', height: '16px', marginRight: '8px' }} />
+                                                <div className="mobile-nav-text">{lang.label}</div>
+                                            </div>
+                                        ))}
+                                    </>
+                                )}
                             </div>
                         )}
                     </div>

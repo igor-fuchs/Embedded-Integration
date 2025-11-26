@@ -7,7 +7,12 @@ import useOnClickOutside from "../hooks/useOnClickOutside";
 import WebInterfaceIcon from "../assets/icons/web-interface-icon.svg?react";
 import ArrowIcon from "../assets/icons/arrow-icon-header.svg?react";
 
-export default function LanguageSelector() {
+interface LanguageSelectorProps {
+    isMobile?: boolean;
+    isOpen?: boolean;
+}
+
+export default function LanguageSelector({ isMobile = false, isOpen: externalIsOpen }: LanguageSelectorProps = {}) {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -21,7 +26,9 @@ export default function LanguageSelector() {
     };
 
     const handleToggleDropdown = () => {
-        setIsOpen(!isOpen);
+        if (!isMobile) {
+            setIsOpen(!isOpen);
+        }
     }
 
     useOnClickOutside(
@@ -30,7 +37,7 @@ export default function LanguageSelector() {
     );
 
     return (
-        <StyleLanguageSelector ref={dropdownRef} id="LanguageSelector">
+        <StyleLanguageSelector ref={dropdownRef} id="LanguageSelector" className="language-selector">
             {/* Header */}
             <div onClick={handleToggleDropdown} className="language-selector-header">
                 <WebInterfaceIcon className="web-icon" id="WebIcon" />
@@ -38,7 +45,7 @@ export default function LanguageSelector() {
                 <ArrowIcon className={isOpen ? "arrow-icon open" : "arrow-icon"} id="ArrowIcon" />
             </div>
             {/* Dropdown Menu */}
-            {isOpen && (
+            {!isMobile && isOpen && (
                 <StyleDropdownMenu>
                     {availableLanguages.map((lang) => (
                         <StyleDropDownItem
