@@ -62,17 +62,9 @@ export default function Header() {
                         </div>
                     </div>
 
-                    {/* Nav links - Version Desktop */}
-                    <div className="nav-links">
-                        <MenuAndLanguageSelector
-                            menuItems={navMenuItems}
-                            isMobile={false}
-                        />
-                    </div>
-
-                    {/* Nav links - Version Mobile */}
+                    {/* Version Mobile */}
                     <div className="mobile-menu-icon" ref={mobileMenuRef} onClick={toggleMobileMenu} >
-                        <img src={MenuBarIcon} alt="Menu" style={{filter: "invert(1)"}} />
+                        <img src={MenuBarIcon} alt="Menu" style={{filter: "invert(1)"}} className="menu-bar-icon" />
                         {isMobileMenuOpen && (
                             <div className="mobile-menu">
                                 <MenuAndLanguageSelector
@@ -82,6 +74,13 @@ export default function Header() {
                             </div>
                         )}
                     </div>
+
+                    {/* Version Desktop */}
+                    <MenuAndLanguageSelector
+                        menuItems={navMenuItems}
+                        isMobile={false}
+                    />
+                    
                 </div>
             </nav>
         </StyleHeader>

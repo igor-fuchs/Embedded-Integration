@@ -1,10 +1,11 @@
 import { useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import i18n, { languagesAvailable } from "../util/translation";
-import { StyleLanguageSelector, StyleDropdownMenu, StyleDropDownItem } from "./styles/MenuAndLanguageSelector";
+import { StyleMenuAndLanguageSelector } from "./styles/MenuAndLanguageSelector";
 import useOnClickOutside from "../hooks/useOnClickOutside";
 import WebInterfaceIcon from "../assets/icons/web-interface-icon.svg?react";
 import ArrowIcon from "../assets/icons/arrow-icon-header.svg?react";
+import PreviousIcon from "../assets/icons/previous-icon.png";
 
 export interface MenuItem {
     label: string;
@@ -61,37 +62,40 @@ export default function MenuAndLanguageSelector({
         () => setIsOpen(false)
     );
 
-    // Render as list (mobile menu)
+    // #region Mobile
     if (isMobile) {
 
         // Show menu items + language selector button
         if (!showLanguages) {
             return (
-                <>
+                <StyleMenuAndLanguageSelector>
                     {menuItems.map((item, index) => (
                         <div key={index} className="mobile-nav-link" onClick={item.onClick}>
                             <div className="mobile-nav-text">{item.label}</div>
                         </div>
                     ))}
                     <div className="mobile-nav-link" onClick={handleLanguageSelectorClick}>
-                        <StyleLanguageSelector id="LanguageSelector" className="language-selector">
+                        <div id="LanguageSelector" className="language-selector">
                             <div className="language-selector-header">
                                 <WebInterfaceIcon className="web-icon" id="WebIcon" />
                                 <p className="language-selector-text" id="LanguageSelectorText">{currentLanguage.label}</p>
                                 <ArrowIcon className="arrow-icon" id="ArrowIcon" />
                             </div>
-                        </StyleLanguageSelector>
+                        </div>
                     </div>
-                </>
+                </StyleMenuAndLanguageSelector>
             );
         }
 
         // Show languages available to selection
         if (showLanguages) {
             return (
-                <>
+                <StyleMenuAndLanguageSelector>
                     <div className="mobile-nav-link" onClick={handleBackClick}>
-                        <div className="mobile-nav-text">← {t("Back")}</div>
+                        <div className="mobile-nav-text back-button">
+                            <img src={PreviousIcon} alt="Previous" className="previous-icon" />
+                            {t("Back")}
+                        </div>
                     </div>
                     {languagesAvailable.map((lang) => (
                         <div
@@ -99,18 +103,20 @@ export default function MenuAndLanguageSelector({
                             className="mobile-nav-link"
                             onClick={() => handleLanguageChange(lang.code)}
                         >
-                            <img src={lang.flag} alt={lang.label} style={{ width: '24px', height: '16px', marginRight: '8px' }} />
+                            <img src={lang.flag} alt={lang.label} style={{ width: '24px', height: '16px' }} />
                             <div className="mobile-nav-text">{lang.label}</div>
                         </div>
                     ))}
-                </>
+                </StyleMenuAndLanguageSelector>
             );
         }
     }
 
-    // Render as dropdown (desktop)
+    // #endregion
+
+    // #region Desktop
     return (
-        <>
+        <StyleMenuAndLanguageSelector className="nav-links">
             {/* Menu Items */}
             {menuItems.map((item, index) => (
                 <div key={index} className="nav-link">
@@ -118,7 +124,7 @@ export default function MenuAndLanguageSelector({
                 </div>
             ))}
             {/* Language Selector */}
-            <StyleLanguageSelector ref={dropdownRef} id="LanguageSelector" className="language-selector">
+            <div ref={dropdownRef} id="LanguageSelector" className="language-selector">
                 {/* Header */}
                 <div onClick={handleToggleDropdown} className="language-selector-header">
                     <WebInterfaceIcon className="web-icon" id="WebIcon" />
@@ -127,20 +133,22 @@ export default function MenuAndLanguageSelector({
                 </div>
                 {/* Dropdown Menu - Only Languages */}
                 {isOpen && (
-                    <StyleDropdownMenu>
+                    <div className="dropdown-menu">
                         {availableLanguages.map((lang) => (
-                            <StyleDropDownItem
+                            <div
                                 key={lang.code}
                                 onClick={() => handleLanguageChange(lang.code)}
                                 id={`DropdownItem ${lang.code}`}
+                                className="dropdown-item"
                             >
                                 <img src={lang.flag} alt={lang.label} />
                                 {lang.label}
-                            </StyleDropDownItem>
+                            </div>
                         ))}
-                    </StyleDropdownMenu>
+                    </div>
                 )}
-            </StyleLanguageSelector>
-        </>
+            </div>
+        </StyleMenuAndLanguageSelector>
     );
+    // #endregion
 }

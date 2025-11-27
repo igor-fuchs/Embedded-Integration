@@ -51,42 +51,14 @@ export const StyleHeader = styled.header`
         white-space: nowrap;
     }
 
-    .nav-links {
-        display: flex;
-        align-items: center;
-        gap: 32px;
-    }
-
-    .nav-link {
-        display: flex;
-        align-items: center;
-    }
-
-    #StyleLanguageSelector {
-        color: #fff;
-    }
-
-    .nav-text {
-        color: #e5e7eb;
-        font-size: 16px;
-        font-weight: 400;
-        line-height: normal;
-        cursor: pointer;
-        transition: color 0.2s ease;
-
-        &:hover {
-            color: #60a5fa;
-        }
-    }
-
     .mobile-menu-icon {
         display: none;
         cursor: pointer;
+    }
 
-        img {
-            width: 20px;
-            height: 20px;
-        }
+    .menu-bar-icon {
+        width: 20px;
+        height: 20px;
     }
 
     .mobile-menu {
@@ -105,28 +77,6 @@ export const StyleHeader = styled.header`
         z-index: 1001;
     }
 
-    .mobile-nav-link {
-        padding: 7px 20px;
-        cursor: pointer;
-        transition: background-color 0.2s ease;
-
-        &:hover {
-            background-color: #334155;
-        }
-    }
-
-    .mobile-nav-text {
-        color: #e5e7eb;
-        font-size: 16px;
-        font-weight: 400;
-        line-height: normal;
-        transition: color 0.2s ease;
-
-        &:hover {
-            color: #60a5fa;
-        }
-    }
-
     @media (max-width: 980px) {
         .header-nav {
             padding: 12px 55px;
@@ -140,34 +90,11 @@ export const StyleHeader = styled.header`
             font-size: 16px;
             line-height: 24px;
         }
-
-        .nav-links {
-            gap: 16px;
-        }
-
-        .nav-text,
-        .language-selector-text {
-            font-size: 14px;
-        }
-
-        .web-icon {
-            width: 14px;
-            height: 14px;
-        }
-
-        .arrow-icon {
-            width: 10.5px;
-            height: 6px;
-        }
     }
 
-    @media (max-width: 690px) {
+    @media (max-width: 730px) {
         .header-nav {
             padding: 12px 16px;
-        }
-
-        .nav-links {
-            display: none;
         }
 
         .mobile-menu-icon {
@@ -208,35 +135,6 @@ export const StyleHeader = styled.header`
         .brand-logo {
             width: 28px;
             height: 28px;
-        }
-
-        /* Component LanguageSelector */
-        .language-selector {
-            justify-content: flex-start;
-        }
-
-        .language-selector-header{
-            gap: 8px;
-        }
-
-        .web-icon {
-            display: none;
-        }
-
-        .language-selector-text {
-            color: #e5e7eb;
-            font-size: 16px;
-            font-weight: 400;
-            line-height: normal;
-            transition: color 0.2s ease;
-
-            &:hover {
-                color: #60a5fa;
-            }
-        }
-
-        .arrow-icon {
-            //display: none;
         }
     }
 `;
