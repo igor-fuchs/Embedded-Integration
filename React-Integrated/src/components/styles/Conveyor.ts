@@ -15,7 +15,6 @@ export const StyleConveyor = styled.div`
         display: flex;
         flex-direction: column;
         animation: none;
-        left: 0;
 
         &.run {
             animation: conveyorMove 5s linear infinite;

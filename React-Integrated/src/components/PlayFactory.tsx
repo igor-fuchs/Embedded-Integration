@@ -121,15 +121,20 @@ export function PlayFactory() {
                                         running={false}
                                         bodyIndex={89}
                                         bodyStyle={equipamentStyle({ width: 68, height: 253, left: 404, bottom: 19 })}
-                                        beltStyle={equipamentStyle({ width: 68, bottom: 31, zIndex: 88 })}
+                                        beltStyle={equipamentStyle({ width: 68, bottom: 31, zIndex: 88, left: 0 })}
                                     />
 
                                     {/* Robot */}
                                     <Robot
                                         id={"robot-left"}
-                                        bodyStyle={equipamentStyle({ width: 153, height: 125, zIndex: 99, left: 296, bottom: 209 })}
-                                        axisXStyle={equipamentStyle({ width: 153, height: 125, zIndex: 98, left: 296, bottom: 209 })}
-                                        axisYStyle={equipamentStyle({ width: 153, height: 125, zIndex: 97, left: 296, bottom: 209 })}
+                                        bodyIndex={99}
+                                        bodyStyle={equipamentStyle({ width: 153, height: 125, left: 296, bottom: 209 })}
+                                        axisXStyle={equipamentStyle({ width: 153, height: 125, zIndex: 98, left: 0, bottom: 0 })}
+                                        axisYStyle={equipamentStyle({ width: 153, height: 125, zIndex: 97, left: 0, bottom: 0 })}
+                                        moveToHome={true}
+                                        moveToPick={false}
+                                        moveToAntecipation={false}
+                                        moveToDrop={false}
                                     />
                                 </section>
 
