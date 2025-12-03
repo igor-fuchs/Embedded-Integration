@@ -83,8 +83,8 @@ export default function Robot({ id, bodyIndex, bodyStyle, axesStyle, moveToHome,
 
             {/* Axes Animated - Axis Y is coupled in the Axis X */}
             <div className="axes" style={{...axesStyle, zIndex: axesIndex }}>
-                <RobotAxisX className="axis-x" style={{ ...axesStyle, zIndex: axisXIndex }} />
-                <RobotAxisY className="axis-y" style={{ ...axesStyle, zIndex: axisYIndex }} />
+                <RobotAxisX className="axis-x" style={{ zIndex: axisXIndex }} />
+                <RobotAxisY className="axis-y" style={{ zIndex: axisYIndex }} />
             </div>
         </StyleRobot>
     );

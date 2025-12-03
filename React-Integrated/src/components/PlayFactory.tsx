@@ -109,17 +109,15 @@ export function PlayFactory() {
                                 className="factory-background"
                                 style={{ backgroundImage: `url(${FactoryBackground})` }}
                             >
-
                                 <section className='left-side'>
                                     <Conveyor
                                         id={"conveyor-left"}
-                                        running={false}
                                         bodyIndex={89}
                                         bodyStyle={equipamentStyle({ width: 68, height: 253, left: 404, bottom: 19 })}
                                         beltStyle={equipamentStyle({ width: 68, bottom: 31, left: 0 })}
+                                        running={false}
                                     />
 
-                                    {/* Robot */}
                                     <Robot
                                         id={"robot-left"}
                                         bodyIndex={99}
@@ -135,27 +133,32 @@ export function PlayFactory() {
                                 <section className='right-side'>
                                     <Conveyor
                                         id={"conveyor-right"}
-                                        running={false}
                                         bodyIndex={89}
                                         bodyStyle={equipamentStyle({ width: 68, height: 253, right: 388, bottom: 19 })}
                                         beltStyle={equipamentStyle({ width: 68, bottom: 31, right: 0 })}
+                                        running={false}
                                     />
 
-                                    {/* Robot */}
                                     <Robot
                                         id={"robot-right"}
                                         bodyIndex={99}
                                         bodyStyle={equipamentStyle({ width: 153, height: 125,  right: 275, bottom: 209 })}
                                         axesStyle={equipamentStyle({ width: 153, height: 125, right: 0, bottom: 0 })}
-                                        moveToHome={false}
+                                        moveToHome={true}
                                         moveToPick={false}
                                         moveToAntecipation={false}
                                         moveToDrop={false}
                                     />
                                 </section>
 
-                                <section className='Center'>
-                                    <BigConveyor  />
+                                <section className='center'>
+                                    <BigConveyor  
+                                        id={"big-conveyor-center"}
+                                        bodyIndex={89}
+                                        bodyStyle={equipamentStyle({ width: 186, height: 369, top: 36, right: 354 })}
+                                        beltStyle={equipamentStyle({ width: 56, bottom: 31, left: 0 })}
+                                        running={false}
+                                    />
                                 </section>
                                 
                             </div>

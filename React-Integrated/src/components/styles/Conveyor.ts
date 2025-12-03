@@ -1,6 +1,10 @@
 import styled from "styled-components";
 
-export const StyleConveyor = styled.div`
+interface ConveyorProps {
+    $running: boolean;
+}
+
+export const StyleConveyor = styled.div<ConveyorProps>`
     overflow: hidden;
 
     .body {
@@ -14,11 +18,9 @@ export const StyleConveyor = styled.div`
         position: absolute;
         display: flex;
         flex-direction: column;
-        animation: none;
-
-        &.run {
-            animation: conveyorMove 5s linear infinite;
-        }
+        animation: conveyorMove 5s linear infinite;
+        animation-play-state: ${(props) =>
+            props.$running ? "running" : "paused"};
     }
 
     @keyframes conveyorMove {

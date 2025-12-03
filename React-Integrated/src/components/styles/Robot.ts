@@ -14,12 +14,20 @@ export const StyleRobot = styled.div<RobotProps>`
     }
 
     .axes {
-        transform: translateX(${props => props.$xOffset}px);
+        transform: translateX(${(props) => props.$xOffset}px);
         transition: transform 400ms ease;
     }
 
+    .axis-x,
     .axis-y {
-        transform: translateY(${props => props.$yOffset}px);
+        position: absolute;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    .axis-y {
+        transform: translateY(${(props) => props.$yOffset}px);
         transition: transform 400ms ease;
-    }   
+    }
 `;
