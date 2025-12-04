@@ -11,7 +11,7 @@ interface RobotProps {
     id: string;
     bodyIndex: number;
     bodyStyle: React.CSSProperties;
-    axesStyle: React.CSSProperties;
+    
     // Animation control
     moveToHome: boolean;
     moveToPick: boolean;
@@ -19,7 +19,7 @@ interface RobotProps {
     moveToDrop: boolean;
 }
 
-export default function Robot({ id, bodyIndex, bodyStyle, axesStyle, moveToHome, moveToPick, moveToAntecipation, moveToDrop }: RobotProps) {
+export default function Robot({ id, bodyIndex, bodyStyle, moveToHome, moveToPick, moveToAntecipation, moveToDrop }: RobotProps) {
     const axesIndex = bodyIndex - 1;
     const axisXIndex = bodyIndex - 2;
     const axisYIndex = bodyIndex - 3;
@@ -36,7 +36,7 @@ export default function Robot({ id, bodyIndex, bodyStyle, axesStyle, moveToHome,
         RobotAxisY = RobotLeftAxisY;
     }
 
-    // Track current X offset so we can stop exactly where we are
+    // Track current X and Y offset so we can stop exactly where we are
     const [xOffset, setXOffset] = useState(0);
     const [yOffset, setYOffset] = useState(0);
 
@@ -82,7 +82,7 @@ export default function Robot({ id, bodyIndex, bodyStyle, axesStyle, moveToHome,
             <RobotBody className="body" style={{ zIndex: bodyIndex }} />
 
             {/* Axes Animated - Axis Y is coupled in the Axis X */}
-            <div className="axes" style={{...axesStyle, zIndex: axesIndex }}>
+            <div className="axes" style={{ zIndex: axesIndex }}>
                 <RobotAxisX className="axis-x" style={{ zIndex: axisXIndex }} />
                 <RobotAxisY className="axis-y" style={{ zIndex: axisYIndex }} />
             </div>

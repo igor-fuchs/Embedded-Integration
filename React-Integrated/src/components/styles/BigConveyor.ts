@@ -22,7 +22,7 @@ export const StyleBigConveyor = styled.div<BigConveyorProps>`
         position: absolute;
         display: flex;
         flex-direction: column;
-        animation: conveyorMove 5 linear infinite;
+        animation: conveyorMove 5s linear infinite;
         animation-play-state: ${(props) =>
             props.$running ? "running" : "paused"};
     }

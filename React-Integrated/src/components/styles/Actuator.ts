@@ -1,11 +1,10 @@
 import styled from "styled-components";
 
-interface RobotProps {
+interface ActuatorProps {
     $xOffset: number;
-    $yOffset: number;
 }
 
-export const StyleRobot = styled.div<RobotProps>`
+export const StyleActuator = styled.div<ActuatorProps>`
     .body {
         position: relative;
         width: 100%;
@@ -13,7 +12,7 @@ export const StyleRobot = styled.div<RobotProps>`
         display: block;
     }
 
-    .axes {
+    .axis {
         position: absolute;
         left: 0;
         top: 0;
@@ -23,16 +22,9 @@ export const StyleRobot = styled.div<RobotProps>`
         transition: transform 400ms ease;
     }
 
-    .axis-x,
-    .axis-y {
+    .piston, .rod{
         position: absolute;
-        left: 0;
         width: 100%;
         height: 100%;
-    }
-
-    .axis-y {
-        transform: translateY(${(props) => props.$yOffset}px);
-        transition: transform 400ms ease;
     }
 `;

@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import BigConveyor from './BigConveyor';
 import Conveyor from './Conveyor';
 import Robot from './Robot';
+import Actuator from './Actuator';
 import PlayButtonIcon from '../assets/icons/play-button-icon.svg';
 import FactoryBackground from '../assets/images/factory-background.svg';
 
@@ -122,7 +123,6 @@ export function PlayFactory() {
                                         id={"robot-left"}
                                         bodyIndex={99}
                                         bodyStyle={equipamentStyle({ width: 153, height: 125, left: 296, bottom: 209 })}
-                                        axesStyle={equipamentStyle({ width: 153, height: 125, left: 0, bottom: 0 })}
                                         moveToHome={false}
                                         moveToPick={false}
                                         moveToAntecipation={false}
@@ -143,7 +143,6 @@ export function PlayFactory() {
                                         id={"robot-right"}
                                         bodyIndex={99}
                                         bodyStyle={equipamentStyle({ width: 153, height: 125,  right: 275, bottom: 209 })}
-                                        axesStyle={equipamentStyle({ width: 153, height: 125, right: 0, bottom: 0 })}
                                         moveToHome={true}
                                         moveToPick={false}
                                         moveToAntecipation={false}
@@ -158,6 +157,31 @@ export function PlayFactory() {
                                         bodyStyle={equipamentStyle({ width: 186, height: 369, top: 36, right: 354 })}
                                         beltStyle={equipamentStyle({ width: 56, bottom: 31, left: 0 })}
                                         running={false}
+                                    />
+
+                                    <Actuator
+                                        id={"actuator-c"}
+                                        bodyIndex={99}
+                                        bodyStyle={equipamentStyle({ width: 144, height: 44, top: 63, left: 412 })}
+                                        axisStyle={equipamentStyle({ width: 144, height: 44, top: 0, left: -56 })}
+                                        advance={false}
+                                        retract={false}
+                                    />
+                                    <Actuator
+                                        id={"actuator-b"}
+                                        bodyIndex={99}
+                                        bodyStyle={equipamentStyle({ width: 144, height: 44, top: 135, left: 412 })}
+                                        axisStyle={equipamentStyle({ width: 144, height: 44, top: 0, left: -56 })}
+                                        advance={false}
+                                        retract={false}
+                                    />
+                                    <Actuator
+                                        id={"actuator-a"}
+                                        bodyIndex={99}
+                                        bodyStyle={equipamentStyle({ width: 144, height: 44, top: 206, left: 412 })}
+                                        axisStyle={equipamentStyle({ width: 144, height: 44, bottom: 0, left: -56 })}
+                                        advance={false}
+                                        retract={false}
                                     />
                                 </section>
                                 
