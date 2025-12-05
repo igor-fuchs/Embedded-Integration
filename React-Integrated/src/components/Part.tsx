@@ -1,17 +1,6 @@
 import { StylePart } from './styles/Part';
-import { useTransformMonitor } from './lib/PartLib';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import GreenPart from '../assets/images/green-part.svg?react';
-
-/* 
-1 - A ideia é fazer com que esse componente utilize o id dos outros componentes para se mover de acordo com a sua posição
-2 - Ele deve ser capaz de criar múltiplas peças, oou seja, não somente um peça, mas sim várias podem estar presentes e cada uma em uma posilção diferente
-
-
-
-Fazer com que ele pegue a posição inicial de Y ao iniciar running, depois fazer um calculo sobre a PosAtual - PosInicial para saber o deslocamento e 
-aplicar esse deslocamento na peça
- */
 
 interface PartProps {
     bodyIndex: number;
@@ -25,29 +14,68 @@ interface PartProps {
     actuatorCRef: React.RefObject<HTMLDivElement | null>;
 }
 
-export default function Part({ bodyIndex, bodyStyle, conveyorRunning, conveyorRef, robotRef, bigConveyorRef, actuatorARef, actuatorBRef, actuatorCRef }: PartProps) {
-    const conveyorTransform = useTransformMonitor(conveyorRef, conveyorRunning);
+// Constantes de animação sincronizadas com a esteira
+const CONVEYOR_ANIMATION_DURATION = 5000; // 5 segundos (igual ao CSS da esteira)
+const FRAME_RATE = 60;
+const FRAME_INTERVAL = 1000 / FRAME_RATE;
 
-    // Extract Y offset from transform matrix
-    const extractYOffset = (transform: string): number => {
-        if (!transform || transform === 'none') return 0;
-        
-        // Transform format: matrix(a, b, c, d, tx, ty)
-        const match = transform.match(/matrix.*\((.+)\)/);
-        if (!match) return 0;
-        
-        const values = match[1].split(',').map(v => parseFloat(v.trim()));
-        
-        // For matrix(a, b, c, d, tx, ty), ty is at index 5
-        return values[5];
+export default function Part({ bodyIndex, bodyStyle, conveyorRunning, conveyorRef, robotRef, bigConveyorRef, actuatorARef, actuatorBRef, actuatorCRef }: PartProps) {
+    const [yOffset, setYOffset] = useState(0);
+    const xOffset = 0;
+    const animationRef = useRef<number | null>(null);
+    const lastTimeRef = useRef<number>(0);
+
+    // Calcula a velocidade baseada na altura da esteira
+    const getConveyorSpeed = () => {
+        if (!conveyorRef.current) return 0;
+        // A animação da esteira move 50% da altura em 5 segundos
+        const conveyorHeight = conveyorRef.current.offsetHeight;
+        const totalMovement = conveyorHeight * 0.5; // 50% da altura
+        // Velocidade em pixels por milissegundo
+        return totalMovement / CONVEYOR_ANIMATION_DURATION;
     };
 
-    const yOffset = -200 + extractYOffset(conveyorTransform);
-    const xOffset = 0;
+    useEffect(() => {
+        if (!conveyorRunning) {
+            // Para a animação quando a esteira para
+            if (animationRef.current) {
+                cancelAnimationFrame(animationRef.current);
+                animationRef.current = null;
+            }
+            return;
+        }
+
+        const animate = (currentTime: number) => {
+            if (!lastTimeRef.current) {
+                lastTimeRef.current = currentTime;
+            }
+
+            const deltaTime = currentTime - lastTimeRef.current;
+
+            if (deltaTime >= FRAME_INTERVAL) {
+                const speed = getConveyorSpeed();
+                // Move para cima (negativo no Y) sincronizado com a esteira
+                setYOffset(prev => prev - speed * deltaTime);
+                lastTimeRef.current = currentTime;
+            }
+
+            animationRef.current = requestAnimationFrame(animate);
+        };
+
+        lastTimeRef.current = 0;
+        animationRef.current = requestAnimationFrame(animate);
+
+        return () => {
+            if (animationRef.current) {
+                cancelAnimationFrame(animationRef.current);
+                animationRef.current = null;
+            }
+        };
+    }, [conveyorRunning, conveyorRef]);
 
     return (
         <StylePart style={bodyStyle} $xOffset={xOffset} $yOffset={yOffset}>
-            <GreenPart className='part' style={{ zIndex: bodyIndex, position: 'absolute',left:0 }} />
+            <GreenPart className='part' style={{ zIndex: bodyIndex, position: 'absolute', left: 0 }} />
         </StylePart>
     );
 }

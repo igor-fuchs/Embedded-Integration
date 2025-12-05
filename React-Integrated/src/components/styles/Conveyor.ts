@@ -19,8 +19,6 @@ export const StyleConveyor = styled.div<ConveyorProps>`
         display: flex;
         flex-direction: column;
         animation: conveyorMove 5s linear infinite;
-        animation-play-state: ${(props) =>
-            props.$running ? "running" : "paused"};
     }
 
     @keyframes conveyorMove {

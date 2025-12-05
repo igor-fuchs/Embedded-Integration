@@ -13,6 +13,5 @@ export const StylePart = styled.div<PartProps>`
             ${(props) => props.$xOffset}px,
             ${(props) => props.$yOffset}px
         );
-        transition: transform 400ms ease;
     }
 `;

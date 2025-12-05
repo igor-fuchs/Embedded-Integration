@@ -1,33 +1,48 @@
-import { useEffect, useState, type RefObject } from 'react';
+import { useEffect, type RefObject } from 'react';
 
-export const useTransformMonitor = (
+export const useYMonitor = (
     ref: RefObject<HTMLElement | null>,
-    isActive: boolean
+    isActive: boolean,
+    setValueOfMovement: React.Dispatch<React.SetStateAction<number>>,
+    valueOfMovement: number
 ) => {
-    const [transform, setTransform] = useState<string>('none');
-
     useEffect(() => {
-        if (!isActive) return;
-
+        if (!ref.current || !isActive) return;
+        
         let animationId: number;
-        let lastTransform = '';
-
-        const monitorTransform = () => {
-            if (ref.current) {
-                const currentTransform = window.getComputedStyle(ref.current).transform;
+        let lastYPosition = ref.current.getBoundingClientRect().y;
+        const refHeight = ref.current.getBoundingClientRect().height;
+        let isRunning = true; // Flag para controlar se deve continuar
+        
+        const yMonitor = () => {
+            if (!ref.current || !isRunning) return; // Verifica a flag
+            
+            const currentYPosition = ref.current.getBoundingClientRect().y;
+            
+            if (currentYPosition !== lastYPosition) {
+                const checkingMovement = lastYPosition - currentYPosition;
                 
-                if (currentTransform !== lastTransform) {
-                    lastTransform = currentTransform;
-                    setTransform(currentTransform);
-                }
+                setValueOfMovement(prev => {
+                    if (checkingMovement > 0) {
+                        return prev - checkingMovement;
+                    } else {
+                        return prev - (checkingMovement + refHeight / 2);
+                    }
+                });
+                
+                lastYPosition = currentYPosition;
             }
-            animationId = requestAnimationFrame(monitorTransform);
+            
+            if (isRunning) { // Só agenda novo frame se ainda estiver rodando
+                animationId = requestAnimationFrame(yMonitor);
+            }
         };
-
-        animationId = requestAnimationFrame(monitorTransform);
-        return () => cancelAnimationFrame(animationId);
-    }, [ref, isActive]);
-
-    console.log('Current Transform:', transform);
-    return transform;
+        
+        animationId = requestAnimationFrame(yMonitor);
+        
+        return () => {
+            isRunning = false; // Para imediatamente
+            cancelAnimationFrame(animationId);
+        };
+    }, [isActive, ref, setValueOfMovement]);
 };
