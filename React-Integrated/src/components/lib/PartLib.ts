@@ -3,19 +3,19 @@ export const isTouching = (partRef: React.RefObject<HTMLDivElement | null>, obje
     if (!partRef.current || !objectRef.current) return false;
 
     const partRect = partRef.current.getBoundingClientRect();
-    const conveyorElement = objectRef.current.parentElement;
-    if (!conveyorElement) return false;
+    const objectElement = objectRef.current.parentElement;
+    if (!objectElement) return false;
 
-    const conveyorRect = conveyorElement.getBoundingClientRect();
+    const objectRect = objectElement.getBoundingClientRect();
 
     // Verifica sobreposição horizontal e vertical
     const horizontalOverlap =
-        partRect.left < conveyorRect.right &&
-        partRect.right > conveyorRect.left;
+        partRect.left < objectRect.right &&
+        partRect.right > objectRect.left;
 
     const verticalOverlap =
-        partRect.top < conveyorRect.bottom &&
-        partRect.bottom > conveyorRect.top;
+        partRect.top < objectRect.bottom &&
+        partRect.bottom > objectRect.top;
 
     return horizontalOverlap && verticalOverlap;
 };

@@ -1,11 +1,6 @@
 import styled from "styled-components";
 
-interface RobotProps {
-    $xOffset: number;
-    $yOffset: number;
-}
-
-export const StyleRobot = styled.div<RobotProps>`
+export const StyleRobot = styled.div`
     .body {
         position: relative;
         width: 100%;
@@ -19,8 +14,6 @@ export const StyleRobot = styled.div<RobotProps>`
         top: 0;
         width: 100%;
         height: 100%;
-        transform: translateX(${(props) => props.$xOffset}px);
-        transition: transform 400ms ease;
     }
 
     .axis-x,
@@ -29,10 +22,5 @@ export const StyleRobot = styled.div<RobotProps>`
         left: 0;
         width: 100%;
         height: 100%;
-    }
-
-    .axis-y {
-        transform: translateY(${(props) => props.$yOffset}px);
-        transition: transform 400ms ease;
     }
 `;

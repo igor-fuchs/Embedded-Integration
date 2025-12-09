@@ -2,12 +2,11 @@ import { useEffect } from 'react';
 import { StyleConveyor } from './styles/Conveyor';
 import Conveyor4mBody from '../assets/images/conveyor-4m-body.svg?react';
 import Conveyor4mBelt from '../assets/images/conveyor-4m-belt.svg?react';
-import type { ConveyorHtmlElement } from './lib/ConveyorLib';
 
 
 interface ConveyorProps {
     id: string;
-    ref: React.RefObject<ConveyorHtmlElement | null>;
+    ref: React.RefObject<HTMLDivElement | null>;
     bodyIndex: number;
     bodyStyle: React.CSSProperties;
     beltStyle: React.CSSProperties;

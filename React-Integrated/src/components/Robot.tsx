@@ -1,11 +1,16 @@
 import { StyleRobot } from "./styles/Robot"
-import { useEffect, useState, type FunctionComponent, type SVGProps } from "react";
+import React, { useEffect, useRef } from "react";
 import RobotRightBody from "../assets/images/robot-right-body.svg?react";
 import RobotRightAxisX from "../assets/images/robot-right-axis-x.svg?react";
 import RobotRightAxisY from "../assets/images/robot-right-axis-y.svg?react";
 import RobotLeftBody from "../assets/images/robot-left-body.svg?react";
 import RobotLeftAxisX from "../assets/images/robot-left-axis-x.svg?react";
 import RobotLeftAxisY from "../assets/images/robot-left-axis-y.svg?react";
+
+export interface RobotMovement {
+    x: React.CSSProperties;
+    y: React.CSSProperties;
+}
 
 interface RobotProps {
     id: string;
@@ -16,74 +21,107 @@ interface RobotProps {
     moveToPick: boolean;
     moveToAntecipation: boolean;
     moveToDrop: boolean;
+    robotMovement: RobotMovement;
+    setRobotMovement: React.Dispatch<React.SetStateAction<RobotMovement>>;
 }
 
-export default function Robot({ id, ref, bodyIndex, bodyStyle, moveToHome, moveToPick, moveToAntecipation, moveToDrop }: RobotProps) {
+export default function Robot({ id, ref, bodyIndex, bodyStyle, moveToHome, moveToPick, moveToAntecipation, moveToDrop, robotMovement, setRobotMovement }: RobotProps) {
     const axesIndex = bodyIndex - 1;
     const axisXIndex = bodyIndex - 2;
     const axisYIndex = bodyIndex - 3;
-    
+
     // Select robot svg based on ID
-    let RobotBody, RobotAxisX, RobotAxisY: FunctionComponent<SVGProps<SVGSVGElement>>;
-    if (id.includes("right")) {
-        RobotBody = RobotRightBody;
-        RobotAxisX = RobotRightAxisX;
-        RobotAxisY = RobotRightAxisY;
-    } else {
-        RobotBody = RobotLeftBody;
-        RobotAxisX = RobotLeftAxisX;
-        RobotAxisY = RobotLeftAxisY;
-    }
+    const RobotBody = id.includes("right") ? RobotRightBody : RobotLeftBody;
+    const RobotAxisX = id.includes("right") ? RobotRightAxisX : RobotLeftAxisX;
+    const RobotAxisY = id.includes("right") ? RobotRightAxisY : RobotLeftAxisY;
 
     // Track current X and Y offset so we can stop exactly where we are
-    const [xOffset, setXOffset] = useState(0);
-    const [yOffset, setYOffset] = useState(0);
+    const xOffset = useRef(0);
+    const yOffset = useRef(0);
 
     useEffect(() => {
-        // Determine positions
-        const homePostion = xOffset == 0 && yOffset == 0;
-        const pickPosition = xOffset == 100 && yOffset == 0;
-        const anticipationPosition = xOffset == 100 && yOffset == -50;
-        const dropPosition = xOffset == 200 && yOffset == -50;
+        if (!ref.current) return;
 
-        // Movement maximum (39, 25) | Movement minimum (-10, -20) -> (X, Y)
+        // NOTE: Movement maximum (39, 25) | Movement minimum (-10, -20) -> (X, Y)
+        // Determine positions (x px, y px)
+        ref.current.dataset.homePosition = '0,0';
+        ref.current.dataset.pickPosition = '100,0';
+        ref.current.dataset.anticipationPosition = '100,50';
+        ref.current.dataset.dropPosition = '100,100';
+
+        // Determine movement times (x ms, y ms)
+        ref.current.dataset.homeTimeMs = '400,400';
+        ref.current.dataset.pickTimeMs = '400,400';
+        ref.current.dataset.anticipationTimeMs = '400,400';
+        ref.current.dataset.dropTimeMs = '400,400';
+    }, []);
+
+    useEffect(() => {
+        // If no movement command, do nothing
+        if (!moveToHome && !moveToPick && !moveToAntecipation && !moveToDrop) return;
+
+        // If already in position, do nothing
+        const homePostion = ref.current?.dataset.homePosition === `${xOffset.current},${yOffset.current}`;
+        const pickPosition = ref.current?.dataset.pickPosition === `${xOffset.current},${yOffset.current}`;
+        const anticipationPosition = ref.current?.dataset.anticipationPosition === `${xOffset.current},${yOffset.current}`;
+        const dropPosition = ref.current?.dataset.dropPosition === `${xOffset.current},${yOffset.current}`;
+        if ((moveToHome && homePostion) || (moveToPick && pickPosition) || (moveToAntecipation && anticipationPosition) || (moveToDrop && dropPosition)) return;
+
+        // (X time, Y time)
+        let movementTime = "0,0";
+
         // Move to home - Moving to (0, 0) (center, center)
         if (moveToHome && !homePostion) {
-            setXOffset(0);
-            setYOffset(0);
-            return;
+            xOffset.current = 0;
+            yOffset.current = 0;
+            movementTime = ref.current!.dataset.homeTimeMs!;
         }
 
         // Move to pick - Moving to (0, 100) (center, down)
         if (moveToPick && !pickPosition) {
-            setXOffset(0);
-            setYOffset(100);
-            return;
+            xOffset.current = 0;
+            yOffset.current = 100;
+            movementTime = ref.current!.dataset.pickTimeMs!;
         }
 
         // Move to anticipation - Moving to (50, 50) (half right, half down)
         if (moveToAntecipation && !anticipationPosition) {
-            setXOffset(50);
-            setYOffset(50);
-            return;
+            xOffset.current = 50;
+            yOffset.current = 50;
+            movementTime = ref.current!.dataset.anticipationTimeMs!;
         }
 
         // Move to drop - Moving to (100, 100) (right, down)
         if (moveToDrop && !dropPosition) {
-            setXOffset(100);
-            setYOffset(100);
-            return;
+            xOffset.current = 100;
+            yOffset.current = 100;
+            movementTime = ref.current!.dataset.dropTimeMs!;
         }
+
+        const [timeX, timeY] = movementTime.split(',');
+
+        setRobotMovement({
+            x: {
+                transform: `translateX(${xOffset.current}px)`,
+                transition: `transform ${timeX}ms ease`,
+            },
+            y: {
+                transform: `translateY(${yOffset.current}px)`,
+                transition: `transform ${timeY}ms ease`,
+            }
+        });
+
     }, [moveToHome, moveToPick, moveToAntecipation, moveToDrop]);
 
     return (
-        <StyleRobot id={id} ref={ref} style={bodyStyle} $xOffset={xOffset} $yOffset={yOffset}>
+        <StyleRobot id={id} ref={ref} style={bodyStyle}>
             <RobotBody className="body" style={{ zIndex: bodyIndex }} />
 
             {/* Axes Animated - Axis Y is coupled in the Axis X */}
-            <div className="axes" style={{ zIndex: axesIndex }}>
+            <div
+                className="axes" style={{ zIndex: axesIndex, ...robotMovement.x }} >
                 <RobotAxisX className="axis-x" style={{ zIndex: axisXIndex }} />
-                <RobotAxisY className="axis-y" style={{ zIndex: axisYIndex }} />
+                <RobotAxisY className="axis-y" style={{ zIndex: axisYIndex, ...robotMovement.y }} />
             </div>
         </StyleRobot>
     );

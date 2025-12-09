@@ -8,7 +8,7 @@ import Actuator from './Actuator';
 import PlayButtonIcon from '../assets/icons/play-button-icon.svg';
 import FactoryBackground from '../assets/images/factory-background.svg';
 import Part from './Part';
-import type { ConveyorHtmlElement } from './lib/ConveyorLib';
+import type { RobotMovement } from './Robot';
 
 // Adicionar um efeito de sombra no arco da esteira para dar profundidade 
 
@@ -23,12 +23,16 @@ export function PlayFactory() {
         toPick: boolean;
         toAntecipation: boolean;
         toDrop: boolean;
+        isGrabbed: boolean;
     }>({
         toHome: false,
         toPick: false,
         toAntecipation: false,
         toDrop: false,
+        isGrabbed: false,
     });
+
+
 
 
     const { t } = useTranslation();
@@ -36,9 +40,14 @@ export function PlayFactory() {
     const [screenHeight, setScreenHeight] = useState<number>(BASE_HEIGHT);
     const screenRef = useRef<HTMLDivElement>(null);
 
+    // Equipament auxs
+    const [robotLeftMovement, setRobotLeftMovement] = useState<RobotMovement>({x: {}, y: {}});
+    const [robotRightMovement, setRobotRightMovement] = useState<RobotMovement>({x: {}, y: {}});
+
+
     // Equipment refs
-    const conveyorLeftRef = useRef<ConveyorHtmlElement>(null);
-    const conveyorRightRef = useRef<ConveyorHtmlElement>(null);
+    const conveyorLeftRef = useRef<HTMLDivElement>(null);
+    const conveyorRightRef = useRef<HTMLDivElement>(null);
     const robotLeftRef = useRef<HTMLDivElement>(null);
     const robotRightRef = useRef<HTMLDivElement>(null);
     const bigConveyorRef = useRef<HTMLDivElement>(null);
@@ -200,6 +209,23 @@ export function PlayFactory() {
                 >
                     Robot toDrop: {robotLeftMoving.toDrop ? 'ON' : 'OFF'}
                 </button>
+                {/* Robot Left - isGrabbed */}
+                <button
+                    onClick={() => setRobotLeftMoving({ ...robotLeftMoving, isGrabbed: !robotLeftMoving.isGrabbed })}
+                    style={{
+                        padding: '10px 15px',
+                        backgroundColor: robotLeftMoving.isGrabbed ? 'rgba(244, 67, 54, 0.7)' : 'rgba(200, 200, 200, 0.7)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontWeight: 'bold',
+                        backdropFilter: 'blur(4px)'
+                    }}
+                >
+                    Robot isGrabbed: {robotLeftMoving.isGrabbed ? 'ON' : 'OFF'}
+                </button>
             </div>
 
             {
@@ -256,6 +282,8 @@ export function PlayFactory() {
                                         moveToPick={robotLeftMoving.toPick}
                                         moveToAntecipation={robotLeftMoving.toAntecipation}
                                         moveToDrop={robotLeftMoving.toDrop}
+                                        setRobotMovement={setRobotLeftMovement}
+                                        robotMovement={robotLeftMovement}
                                     />
                                 </section>
 
@@ -277,6 +305,8 @@ export function PlayFactory() {
                                         moveToPick={false}
                                         moveToAntecipation={false}
                                         moveToDrop={false}
+                                        setRobotMovement={setRobotRightMovement}
+                                        robotMovement={robotRightMovement}
                                     />
                                 </section>
 
@@ -322,13 +352,15 @@ export function PlayFactory() {
                                     <Part 
                                         bodyIndex={100}
                                         bodyStyle={equipamentStyle({ width: 20, height: 20, left: 430, bottom: 36 })}
-                                        conveyorRef={conveyorLeftRef}
-                                        conveyorRunning={conveyorLeftRunning}
-                                        robotRef={robotLeftRef}
-                                        moveToHome={robotLeftMoving.toHome}
-                                        moveToPick={robotLeftMoving.toPick}
-                                        moveToAntecipation={robotLeftMoving.toAntecipation}
-                                        moveToDrop={robotLeftMoving.toDrop}
+                                        conveyor={{
+                                            ref: conveyorLeftRef,
+                                            running: conveyorLeftRunning,
+                                        }}
+                                        robot={{
+                                            ref: robotLeftRef,
+                                            isGrabbed: robotLeftMoving.isGrabbed,
+                                            movement: robotLeftMovement,
+                                        }}
                                         bigConveyorRef={bigConveyorRef}
                                         actuatorARef={actuatorARef}
                                         actuatorBRef={actuatorBRef}
