@@ -23,9 +23,10 @@ interface RobotProps {
     moveToDrop: boolean;
     robotMovement: RobotMovement;
     setRobotMovement: React.Dispatch<React.SetStateAction<RobotMovement>>;
+    scaleFactor: number;
 }
 
-export default function Robot({ id, ref, bodyIndex, bodyStyle, moveToHome, moveToPick, moveToAntecipation, moveToDrop, robotMovement, setRobotMovement }: RobotProps) {
+export default function Robot({ id, ref, bodyIndex, bodyStyle, moveToHome, moveToPick, moveToAntecipation, moveToDrop, robotMovement, setRobotMovement, scaleFactor }: RobotProps) {
     const axesIndex = bodyIndex - 1;
     const axisXIndex = bodyIndex - 2;
     const axisYIndex = bodyIndex - 3;
@@ -44,17 +45,22 @@ export default function Robot({ id, ref, bodyIndex, bodyStyle, moveToHome, moveT
 
         // NOTE: Movement maximum (39, 25) | Movement minimum (-10, -20) -> (X, Y)
         // Determine positions (x px, y px)
-        ref.current.dataset.homePosition = '0,0';
-        ref.current.dataset.pickPosition = '100,0';
-        ref.current.dataset.anticipationPosition = '100,50';
-        ref.current.dataset.dropPosition = '100,100';
+        const homePosition = {x: 0, y: 0};
+        const pickPosition = {x: 0, y: 81};
+        const anticipationPosition = {x: 12.5, y: 12.5};
+        const dropPosition = {x: 39, y: 25};
+
+        ref.current.dataset.homePosition = `${homePosition.x * scaleFactor},${homePosition.y * scaleFactor}`;
+        ref.current.dataset.pickPosition = `${pickPosition.x * scaleFactor},${pickPosition.y * scaleFactor}`;
+        ref.current.dataset.anticipationPosition = `${anticipationPosition.x * scaleFactor},${anticipationPosition.y * scaleFactor}`;
+        ref.current.dataset.dropPosition = `${dropPosition.x * scaleFactor},${dropPosition.y * scaleFactor}`;
 
         // Determine movement times (x ms, y ms)
         ref.current.dataset.homeTimeMs = '400,400';
         ref.current.dataset.pickTimeMs = '400,400';
         ref.current.dataset.anticipationTimeMs = '400,400';
         ref.current.dataset.dropTimeMs = '400,400';
-    }, []);
+    }, [scaleFactor]);
 
     useEffect(() => {
         // If no movement command, do nothing
@@ -70,31 +76,35 @@ export default function Robot({ id, ref, bodyIndex, bodyStyle, moveToHome, moveT
         // (X time, Y time)
         let movementTime = "0,0";
 
-        // Move to home - Moving to (0, 0) (center, center)
+        // Move to home
         if (moveToHome && !homePostion) {
-            xOffset.current = 0;
-            yOffset.current = 0;
+            const postion = ref.current!.dataset.homePosition!.split(',');
+            xOffset.current = parseFloat(postion[0]);
+            yOffset.current = parseFloat(postion[1]);
             movementTime = ref.current!.dataset.homeTimeMs!;
         }
 
-        // Move to pick - Moving to (0, 100) (center, down)
+        // Move to pick
         if (moveToPick && !pickPosition) {
-            xOffset.current = 0;
-            yOffset.current = 100;
+            const postion = ref.current!.dataset.pickPosition!.split(',');
+            xOffset.current = parseFloat(postion[0]);
+            yOffset.current = parseFloat(postion[1]);
             movementTime = ref.current!.dataset.pickTimeMs!;
         }
 
-        // Move to anticipation - Moving to (50, 50) (half right, half down)
+        // Move to anticipation
         if (moveToAntecipation && !anticipationPosition) {
-            xOffset.current = 50;
-            yOffset.current = 50;
+            const postion = ref.current!.dataset.anticipationPosition!.split(',');
+            xOffset.current = parseFloat(postion[0]);
+            yOffset.current = parseFloat(postion[1]);
             movementTime = ref.current!.dataset.anticipationTimeMs!;
         }
 
-        // Move to drop - Moving to (100, 100) (right, down)
+        // Move to drop
         if (moveToDrop && !dropPosition) {
-            xOffset.current = 100;
-            yOffset.current = 100;
+            const postion = ref.current!.dataset.dropPosition!.split(',');
+            xOffset.current = parseFloat(postion[0]);
+            yOffset.current = parseFloat(postion[1]);
             movementTime = ref.current!.dataset.dropTimeMs!;
         }
 

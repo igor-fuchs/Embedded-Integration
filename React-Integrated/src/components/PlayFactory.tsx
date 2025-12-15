@@ -32,9 +32,6 @@ export function PlayFactory() {
         isGrabbed: false,
     });
 
-
-
-
     const { t } = useTranslation();
     const [simulationStart, setSimulationStart] = useState<boolean>(false);
     const [screenHeight, setScreenHeight] = useState<number>(BASE_HEIGHT);
@@ -284,6 +281,7 @@ export function PlayFactory() {
                                         moveToDrop={robotLeftMoving.toDrop}
                                         setRobotMovement={setRobotLeftMovement}
                                         robotMovement={robotLeftMovement}
+                                        scaleFactor={getScaleCoefficient()}
                                     />
                                 </section>
 
@@ -307,6 +305,7 @@ export function PlayFactory() {
                                         moveToDrop={false}
                                         setRobotMovement={setRobotRightMovement}
                                         robotMovement={robotRightMovement}
+                                        scaleFactor={getScaleCoefficient()}
                                     />
                                 </section>
 
