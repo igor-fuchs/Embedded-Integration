@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { StylePart } from './styles/Part';
-import { isTouching } from './lib/PartLib';
+import { followConveyorAnimation, isTouching } from './lib/PartLib';
 import GreenPart from '../assets/images/green-part.svg?react';
 import type { RobotMovement } from './Robot';
 
@@ -27,66 +27,45 @@ interface PartProps {
 }
 
 export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyor, actuatorARef, actuatorBRef, actuatorCRef, scaleFactor }: PartProps) {
-    const animationID = useRef<number | null>(null);
-    const frameTime = useRef<number>(0);
     const partRef = useRef<HTMLDivElement>(null);
     const [offset, setOffset] = useState({
         x: 81.5,
         y: -170,
     });
+    
+    // Conveyor vars
+    const conveyorAnimationID = useRef<number | null>(null);
+    const conveyorFrameTime = useRef<number>(0);
 
-    // Track previous robot position for incremental movement
-    const previousRobotPosition = useRef({ x: null, y: null } as { x: number | null; y: number | null });
+    //Big conveyor vars
+    const bigConveyorAnimationID = useRef<number | null>(null);
+    const bigConveyorFrameTime = useRef<number>(0);
+
+    // Robot vars
+    const previousRobotPosition = useRef({ x: null, y: null } as { x: number | null; y: number | null }); // Track previous robot position for incremental movement
     const [partTransition, setPartTransition] = useState<string>('');
+
+
 
     // #region First Conveyor
     useEffect(() => {
-        // Stopping unnecessary animation frames
-        if (!conveyor.running || !isTouching(partRef, conveyor.ref)) {
-            cancelAnimationFrame(animationID.current!);
-            animationID.current = null;
-            return;
-        }
-
-        const followConveyor = (currentTime: number) => {
-            // Intializing the animation start time
-            if (!frameTime.current) {
-                frameTime.current = currentTime;
-            }
-
-            // Calculating time difference
-            const deltaTime = currentTime - frameTime.current;
-
-            if (deltaTime > 0) {
-                const speed = parseFloat(conveyor.ref.current?.dataset.speedMs || '0');
-
-                // Moving animation based on speed and time elapsed
-                setOffset(prev => ({ ...prev, y: prev.y - speed * deltaTime / scaleFactor }));
-
-                // Changing the firstTime to the current time after frame update
-                frameTime.current = currentTime;
-            }
-
-            animationID.current = requestAnimationFrame(followConveyor);
-        };
-
-        frameTime.current = 0;
-        animationID.current = requestAnimationFrame(followConveyor);
-        return () => {
-            if (animationID.current) {
-                cancelAnimationFrame(animationID.current);
-                animationID.current = null;
-            }
-        };
-
+        followConveyorAnimation({
+            conveyorRef: conveyor.ref,
+            frameTime: conveyorFrameTime,
+            animationID: conveyorAnimationID,
+            running: conveyor.running,
+            touching: isTouching(partRef, conveyor.ref),
+            scaleFactor,
+            setOffset
+        });
     }, [conveyor.running]);
     // #endregion
 
     // #region Robot
     useEffect(() => {
-        if(!robot.isGrabbed) {
+        if (!robot.isGrabbed) {
             previousRobotPosition.current = { x: null, y: null };
-            if(partTransition) setPartTransition(''); // Avoid unexpected delays
+            if (partTransition) setPartTransition(''); // Avoid unexpected delays
             return;
         }
         if (!robot.ref.current) return;
@@ -96,7 +75,7 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
         const currentY = robot.movement.y.transformPx;
 
         // Initialize previous position if not set
-        if(previousRobotPosition.current.x === null || previousRobotPosition.current.y === null) {
+        if (previousRobotPosition.current.x === null || previousRobotPosition.current.y === null) {
             previousRobotPosition.current = { x: currentX, y: currentY };
         }
 
@@ -130,43 +109,16 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
 
     // #region Big Conveyor
     useEffect(() => {
-        // Stopping unnecessary animation frames
-        if (!bigConveyor.running || !isTouching(partRef, bigConveyor.ref)) {
-            cancelAnimationFrame(animationID.current!);
-            animationID.current = null;
-            return;
-        }
+        followConveyorAnimation({
+            conveyorRef: bigConveyor.ref,
+            frameTime: bigConveyorFrameTime,
+            animationID: bigConveyorAnimationID,
+            running: bigConveyor.running,
+            touching: isTouching(partRef, bigConveyor.ref),
+            scaleFactor,
+            setOffset
+        });
 
-        const followBigConveyor = (currentTime: number) => {
-            // Intializing the animation start time
-            if (!frameTime.current) {
-                frameTime.current = currentTime;
-            }
-
-            // Calculating time difference
-            const deltaTime = currentTime - frameTime.current;
-
-            if (deltaTime > 0) {
-                const speed = parseFloat(bigConveyor.ref.current?.dataset.speedMs || '0');
-
-                // Moving animation based on speed and time elapsed
-                setOffset(prev => ({ ...prev, y: prev.y - speed * deltaTime / scaleFactor }));
-
-                // Changing the firstTime to the current time after frame update
-                frameTime.current = currentTime;
-            }
-
-            animationID.current = requestAnimationFrame(followBigConveyor);
-        };
-
-        frameTime.current = 0;
-        animationID.current = requestAnimationFrame(followBigConveyor);
-        return () => {
-            if (animationID.current) {
-                cancelAnimationFrame(animationID.current);
-                animationID.current = null;
-            }
-        };
 
     }, [bigConveyor.running]);
     // #endregion

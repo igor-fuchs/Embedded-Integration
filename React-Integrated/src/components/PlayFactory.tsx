@@ -32,6 +32,19 @@ export function PlayFactory() {
         toDrop: false,
         isGrabbed: false,
     });
+    const [actuatorAMoving, setActuatorAMoving] = useState<{ retract: boolean, advance: boolean }>({ retract: false, advance: false });
+    const [actuatorBMoving, setActuatorBMoving] = useState<{ retract: boolean, advance: boolean }>({ retract: false, advance: false });
+    const [actuatorCMoving, setActuatorCMoving] = useState<{ retract: boolean, advance: boolean }>({ retract: false, advance: false });
+    const styleTestButtons = (value: boolean): React.CSSProperties => ({
+        padding: '10px 15px',
+        backgroundColor: value ? 'rgba(76, 175, 80, 0.7)' : 'rgba(200, 200, 200, 0.5)',
+        color: 'white',
+        border: 'none',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        fontSize: '12px',
+        fontWeight: 'bold',
+    });
 
     const { t } = useTranslation();
     const [simulationStart, setSimulationStart] = useState<boolean>(false);
@@ -136,17 +149,7 @@ export function PlayFactory() {
                 {/* Conveyor Left Running Button */}
                 <button
                     onClick={() => setConveyorLeftRunning(!conveyorLeftRunning)}
-                    style={{
-                        padding: '10px 15px',
-                        backgroundColor: conveyorLeftRunning ? 'rgba(76, 175, 80, 0.7)' : 'rgba(200, 200, 200, 0.7)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px',
-                        fontWeight: 'bold',
-                        backdropFilter: 'blur(4px)'
-                    }}
+                    style={styleTestButtons(conveyorLeftRunning)}
                 >
                     Conveyor Left: {conveyorLeftRunning ? 'ON' : 'OFF'}
                 </button>
@@ -154,17 +157,7 @@ export function PlayFactory() {
                 {/* Robot Left - toHome Button */}
                 <button
                     onClick={() => setRobotLeftMoving({ ...robotLeftMoving, toHome: !robotLeftMoving.toHome })}
-                    style={{
-                        padding: '10px 15px',
-                        backgroundColor: robotLeftMoving.toHome ? 'rgba(33, 150, 243, 0.7)' : 'rgba(200, 200, 200, 0.7)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px',
-                        fontWeight: 'bold',
-                        backdropFilter: 'blur(4px)'
-                    }}
+                    style={styleTestButtons(robotLeftMoving.toHome)}
                 >
                     Robot toHome: {robotLeftMoving.toHome ? 'ON' : 'OFF'}
                 </button>
@@ -172,17 +165,7 @@ export function PlayFactory() {
                 {/* Robot Left - toPick Button */}
                 <button
                     onClick={() => setRobotLeftMoving({ ...robotLeftMoving, toPick: !robotLeftMoving.toPick })}
-                    style={{
-                        padding: '10px 15px',
-                        backgroundColor: robotLeftMoving.toPick ? 'rgba(255, 152, 0, 0.7)' : 'rgba(200, 200, 200, 0.7)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px',
-                        fontWeight: 'bold',
-                        backdropFilter: 'blur(4px)'
-                    }}
+                    style={styleTestButtons(robotLeftMoving.toPick)}
                 >
                     Robot toPick: {robotLeftMoving.toPick ? 'ON' : 'OFF'}
                 </button>
@@ -190,17 +173,7 @@ export function PlayFactory() {
                 {/* Robot Left - toAntecipation Button */}
                 <button
                     onClick={() => setRobotLeftMoving({ ...robotLeftMoving, toAntecipation: !robotLeftMoving.toAntecipation })}
-                    style={{
-                        padding: '10px 15px',
-                        backgroundColor: robotLeftMoving.toAntecipation ? 'rgba(156, 39, 176, 0.7)' : 'rgba(200, 200, 200, 0.7)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px',
-                        fontWeight: 'bold',
-                        backdropFilter: 'blur(4px)'
-                    }}
+                    style={styleTestButtons(robotLeftMoving.toAntecipation)}
                 >
                     Robot toAntecipation: {robotLeftMoving.toAntecipation ? 'ON' : 'OFF'}
                 </button>
@@ -208,50 +181,20 @@ export function PlayFactory() {
                 {/* Robot Left - toDrop Button */}
                 <button
                     onClick={() => setRobotLeftMoving({ ...robotLeftMoving, toDrop: !robotLeftMoving.toDrop })}
-                    style={{
-                        padding: '10px 15px',
-                        backgroundColor: robotLeftMoving.toDrop ? 'rgba(244, 67, 54, 0.7)' : 'rgba(200, 200, 200, 0.7)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px',
-                        fontWeight: 'bold',
-                        backdropFilter: 'blur(4px)'
-                    }}
+                    style={styleTestButtons(robotLeftMoving.toDrop)}
                 >
                     Robot toDrop: {robotLeftMoving.toDrop ? 'ON' : 'OFF'}
                 </button>
                 {/* Robot Left - isGrabbed */}
                 <button
                     onClick={() => setRobotLeftMoving({ ...robotLeftMoving, isGrabbed: !robotLeftMoving.isGrabbed })}
-                    style={{
-                        padding: '10px 15px',
-                        backgroundColor: robotLeftMoving.isGrabbed ? 'rgba(244, 67, 54, 0.7)' : 'rgba(200, 200, 200, 0.7)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px',
-                        fontWeight: 'bold',
-                        backdropFilter: 'blur(4px)'
-                    }}
+                    style={styleTestButtons(robotLeftMoving.isGrabbed)}
                 >
                     Robot isGrabbed: {robotLeftMoving.isGrabbed ? 'ON' : 'OFF'}
                 </button>
                 <button
                     onClick={() => setBigConveyorRunning(!bigConveyorRunning)}
-                    style={{
-                        padding: '10px 15px',
-                        backgroundColor: bigConveyorRunning ? 'rgba(54, 67, 244, 0.7)' : 'rgba(200, 200, 200, 0.7)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px',
-                        fontWeight: 'bold',
-                        backdropFilter: 'blur(4px)'
-                    }}
+                    style={styleTestButtons(bigConveyorRunning)}
                 >
                     Big Conveyor Running: {bigConveyorRunning ? 'ON' : 'OFF'}
                 </button>
@@ -359,8 +302,8 @@ export function PlayFactory() {
                                         bodyIndex={99}
                                         bodyStyle={equipamentStyle({ width: 144, height: 44, top: 63, left: 412 })}
                                         axisStyle={equipamentStyle({ width: 144, height: 44, top: 0, left: -56 })}
-                                        advance={false}
-                                        retract={false}
+                                        advance={actuatorCMoving.advance}
+                                        retract={actuatorCMoving.retract}
                                     />
                                     <Actuator
                                         id={"actuator-b"}
@@ -368,8 +311,8 @@ export function PlayFactory() {
                                         bodyIndex={99}
                                         bodyStyle={equipamentStyle({ width: 144, height: 44, top: 135, left: 412 })}
                                         axisStyle={equipamentStyle({ width: 144, height: 44, top: 0, left: -56 })}
-                                        advance={false}
-                                        retract={false}
+                                        advance={actuatorBMoving.advance}
+                                        retract={actuatorBMoving.retract}
                                     />
                                     <Actuator
                                         id={"actuator-a"}
@@ -377,8 +320,8 @@ export function PlayFactory() {
                                         bodyIndex={99}
                                         bodyStyle={equipamentStyle({ width: 144, height: 44, top: 206, left: 412 })}
                                         axisStyle={equipamentStyle({ width: 144, height: 44, bottom: 0, left: -56 })}
-                                        advance={false}
-                                        retract={false}
+                                        advance={actuatorAMoving.advance}
+                                        retract={actuatorAMoving.retract}
                                     />
                                 </section>
 
