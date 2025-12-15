@@ -17,6 +17,7 @@ const BASE_HEIGHT = 590;
 
 export function PlayFactory() {
     // Test variables after delete
+    const [bigConveyorRunning, setBigConveyorRunning] = useState<boolean>(false);
     const [conveyorLeftRunning, setConveyorLeftRunning] = useState<boolean>(false);
     const [robotLeftMoving, setRobotLeftMoving] = useState<{
         toHome: boolean;
@@ -40,23 +41,23 @@ export function PlayFactory() {
     // Equipament auxs
     const [robotLeftMovement, setRobotLeftMovement] = useState<RobotMovement>({
         x: {
-            transform: '',
-            transition: ''
+            transformPx: 0,
+            transitionMs: 0
         }, y: {
-            transform: '',
-            transition: ''
+            transformPx: 0,
+            transitionMs: 0
         }
     });
     const [robotRightMovement, setRobotRightMovement] = useState<RobotMovement>({
         x: {
-            transform: '',
-            transition: ''
-        },
-        y: {
-            transform: '',
-            transition: ''
+            transformPx: 0,
+            transitionMs: 0
+        }, y: {
+            transformPx: 0,
+            transitionMs: 0
         }
     });
+
     // Equipment refs
     const conveyorLeftRef = useRef<HTMLDivElement>(null);
     const conveyorRightRef = useRef<HTMLDivElement>(null);
@@ -238,6 +239,22 @@ export function PlayFactory() {
                 >
                     Robot isGrabbed: {robotLeftMoving.isGrabbed ? 'ON' : 'OFF'}
                 </button>
+                <button
+                    onClick={() => setBigConveyorRunning(!bigConveyorRunning)}
+                    style={{
+                        padding: '10px 15px',
+                        backgroundColor: bigConveyorRunning ? 'rgba(54, 67, 244, 0.7)' : 'rgba(200, 200, 200, 0.7)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontWeight: 'bold',
+                        backdropFilter: 'blur(4px)'
+                    }}
+                >
+                    Big Conveyor Running: {bigConveyorRunning ? 'ON' : 'OFF'}
+                </button>
             </div>
 
             {
@@ -284,6 +301,7 @@ export function PlayFactory() {
                                         bodyStyle={equipamentStyle({ width: 68, height: 253, left: 404, bottom: 19 })}
                                         beltStyle={equipamentStyle({ width: 68, bottom: 31, left: 0 })}
                                         running={conveyorLeftRunning}
+                                        scaleFactor={getScaleCoefficient()}
                                     />
                                     <Robot
                                         id={"robot-left"}
@@ -308,6 +326,7 @@ export function PlayFactory() {
                                         bodyStyle={equipamentStyle({ width: 68, height: 253, right: 388, bottom: 19 })}
                                         beltStyle={equipamentStyle({ width: 68, bottom: 31, right: 0 })}
                                         running={false}
+                                        scaleFactor={getScaleCoefficient()}
                                     />
                                     <Robot
                                         id={"robot-right"}
@@ -331,7 +350,8 @@ export function PlayFactory() {
                                         bodyIndex={89}
                                         bodyStyle={equipamentStyle({ width: 186, height: 369, top: 36, right: 354 })}
                                         beltStyle={equipamentStyle({ width: 56, bottom: 31, left: 0 })}
-                                        running={false}
+                                        running={bigConveyorRunning}
+                                        scaleFactor={getScaleCoefficient()}
                                     />
                                     <Actuator
                                         id={"actuator-c"}
@@ -364,7 +384,7 @@ export function PlayFactory() {
 
                                 <section className='Parts'>
                                     <Part
-                                        bodyIndex={100}
+                                        bodyIndex={90}
                                         bodyStyle={equipamentStyle({ width: 20, height: 20, left: 430, bottom: 36 })}
                                         conveyor={{
                                             ref: conveyorLeftRef,

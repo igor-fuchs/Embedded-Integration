@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { StylePart } from './styles/Part';
 import { isTouching } from './lib/PartLib';
 import GreenPart from '../assets/images/green-part.svg?react';
+import type { RobotMovement } from './Robot';
 
 interface PartProps {
     bodyIndex: number;
@@ -13,7 +14,7 @@ interface PartProps {
     robot: {
         ref: React.RefObject<HTMLDivElement | null>;
         isGrabbed: boolean;
-        movement: { x: React.CSSProperties, y: React.CSSProperties };
+        movement: RobotMovement;
     };
     bigConveyorRef: React.RefObject<HTMLDivElement | null>;
     actuatorARef: React.RefObject<HTMLDivElement | null>;
@@ -27,8 +28,8 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
     const frameTime = useRef<number>(0);
     const partRef = useRef<HTMLDivElement>(null);
     const [offset, setOffset] = useState({
-        x: 0,
-        y: 0,
+        x: 81.5,
+        y: -170,
     });
 
     // Track previous robot position for incremental movement
@@ -57,7 +58,7 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
                 const speed = parseFloat(conveyor.ref.current?.dataset.speedMs || '0');
 
                 // Moving animation based on speed and time elapsed
-                setOffset(prev => ({ ...prev, y: prev.y - speed * deltaTime }));
+                setOffset(prev => ({ ...prev, y: prev.y - speed * deltaTime / scaleFactor }));
 
                 // Changing the firstTime to the current time after frame update
                 frameTime.current = currentTime;
@@ -86,16 +87,9 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
         }
         if (!robot.ref.current) return;
 
-        // Helper to parse translateX(Npx) or translateY(Npx) from transform string
-        const parseTranslate = (transform: string): number => {
-            if (!transform) return 0;
-            const match = transform.match(/translate[XY]\(([+-]?[\d.]+)px\)/);
-            return match ? parseFloat(match[1]) : 0;
-        };
-
         // Extract current robot position from robot.movement
-        const currentX = parseTranslate(robot.movement.x.transform as string);
-        const currentY = parseTranslate(robot.movement.y.transform as string);
+        const currentX = robot.movement.x.transformPx;
+        const currentY = robot.movement.y.transformPx;
 
         // Initialize previous position if not set
         if(previousRobotPosition.current.x === null || previousRobotPosition.current.y === null) {
@@ -117,11 +111,11 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
             previousRobotPosition.current = { x: currentX, y: currentY };
 
             // Extract and combine transitions (use the one that's not default)
-            const xTransition = robot.movement.x.transition as string;
-            const yTransition = robot.movement.y.transition as string; // Check if in the future we need to combine both
+            const xTransitionMs = robot.movement.x.transitionMs;
+            const yTransitionMs = robot.movement.y.transitionMs; // Check if in the future we need to combine both
 
-            // Apply transition (prefer the one with transform in it)
-            const transition = xTransition;
+            // Apply transition (prefer the x transition)
+            const transition = `transform ${xTransitionMs}ms ease`;
             if (transition) {
                 setPartTransition(transition);
             }
@@ -137,8 +131,8 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
                 zIndex: bodyIndex,
                 transition: partTransition
             }}
-            $xOffset={offset.x}
-            $yOffset={offset.y}
+            $xOffset={offset.x * scaleFactor}
+            $yOffset={offset.y * scaleFactor}
         >
             <GreenPart className='part' />
         </StylePart>

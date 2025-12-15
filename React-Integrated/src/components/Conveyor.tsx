@@ -11,9 +11,10 @@ interface ConveyorProps {
     bodyStyle: React.CSSProperties;
     beltStyle: React.CSSProperties;
     running: boolean;
+    scaleFactor: number;
 }
 
-export default function Conveyor({ id, ref, bodyIndex, bodyStyle, beltStyle, running }: ConveyorProps) {
+export default function Conveyor({ id, ref, bodyIndex, bodyStyle, beltStyle, running, scaleFactor }: ConveyorProps) {
     const beltIndex = bodyIndex - 1;
     const animationDurationMs = 5000;
 
@@ -26,7 +27,7 @@ export default function Conveyor({ id, ref, bodyIndex, bodyStyle, beltStyle, run
 
         // Speed in pixels per millisecond
         ref.current.dataset.speedMs = (totalMovement / animationDurationMs).toString();
-    }, []);
+    }, [scaleFactor]); // Ensure it recalculates if scaleFactor changes
 
 
     useEffect(() => {

@@ -1,10 +1,6 @@
 import styled from "styled-components";
 
-interface BigConveyorProps {
-    $running: boolean;
-}
-
-export const StyleBigConveyor = styled.div<BigConveyorProps>`
+export const StyleBigConveyor = styled.div`
     position: relative;
     overflow: hidden;
 
@@ -22,17 +18,5 @@ export const StyleBigConveyor = styled.div<BigConveyorProps>`
         position: absolute;
         display: flex;
         flex-direction: column;
-        animation: conveyorMove 5s linear infinite;
-        animation-play-state: ${(props) =>
-            props.$running ? "running" : "paused"};
-    }
-
-    @keyframes conveyorMove {
-        0% {
-            transform: translateY(50%);
-        }
-        100% {
-            transform: translateY(0);
-        }
     }
 `;

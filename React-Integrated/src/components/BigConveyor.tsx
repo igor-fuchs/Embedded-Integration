@@ -11,16 +11,17 @@ interface BigConveyorProps {
     bodyIndex: number;
     bodyStyle: React.CSSProperties;
     beltStyle: React.CSSProperties;
+    scaleFactor: number;
 }
 
-export default function BigConveyor({ id, ref, running, bodyIndex, bodyStyle, beltStyle }: BigConveyorProps) {
+export default function BigConveyor({ id, ref, running, bodyIndex, bodyStyle, beltStyle, scaleFactor }: BigConveyorProps) {
     // Part z-index needs to be bodyIndex + 1
     const archIndex = bodyIndex + 2;
     const boxesIndex = bodyIndex + 3;
     const beltIndex = bodyIndex - 1;
 
     return (
-        <StyleBigConveyor id={id} ref={ref} style={bodyStyle} $running={running}>
+        <StyleBigConveyor id={id} ref={ref} style={bodyStyle}>
             <Conveyor8mBody className="body" style={{ zIndex: bodyIndex }} />
             <Conveyor8mArch className="arch" style={{ zIndex: archIndex }} />
             <Conveyor8mBoxes className="boxes" style={{ zIndex: boxesIndex }} />

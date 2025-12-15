@@ -9,12 +9,12 @@ import RobotLeftAxisY from "../assets/images/robot-left-axis-y.svg?react";
 
 export interface RobotMovement {
     x: {
-        transform: string;
-        transition: string;
+        transformPx: number;
+        transitionMs: number;
     };
     y: {
-        transform: string;
-        transition: string;
+        transformPx: number;
+        transitionMs: number;
     };
 }
 
@@ -52,9 +52,9 @@ export default function Robot({ id, ref, bodyIndex, bodyStyle, moveToHome, moveT
         // NOTE: Movement maximum (39, 25) | Movement minimum (-10, -20) -> (X, Y)
         // Determine positions (x px, y px)
         const homePosition = { x: 0, y: 0 };
-        const pickPosition = { x: 0, y: 81 };
+        const pickPosition = { x: 0, y: 15 };
         const anticipationPosition = { x: 12.5, y: 12.5 };
-        const dropPosition = { x: 39, y: 25 };
+        const dropPosition = { x: 81.5, y: 15 };
 
         ref.current.dataset.homePosition = `${homePosition.x},${homePosition.y}`;
         ref.current.dataset.pickPosition = `${pickPosition.x},${pickPosition.y}`;
@@ -66,21 +66,7 @@ export default function Robot({ id, ref, bodyIndex, bodyStyle, moveToHome, moveT
         ref.current.dataset.pickTimeMs = '400,400';
         ref.current.dataset.anticipationTimeMs = '400,400';
         ref.current.dataset.dropTimeMs = '400,400';
-
-        // Resizing the position, ensure that the robot stays at the correct position when scaleFactor changes
-        if (robotMovement.x.transform && robotMovement.y.transform) {
-            setRobotMovement(prev => ({
-                x: {
-                    ...prev.x,
-                    transform: `translateX(${xOffset.current * scaleFactor}px)`,
-                },
-                y: {
-                    ...prev.y,
-                    transform: `translateY(${yOffset.current * scaleFactor}px)`,
-                }
-            }));
-        }
-    }, [scaleFactor]);
+    }, []);
 
     useEffect(() => {
         // If no movement command, do nothing
@@ -132,12 +118,12 @@ export default function Robot({ id, ref, bodyIndex, bodyStyle, moveToHome, moveT
 
         setRobotMovement({
             x: {
-                transform: `translateX(${xOffset.current * scaleFactor}px)`,
-                transition: `transform ${timeX}ms ease`,
+                transformPx: xOffset.current,
+                transitionMs: parseInt(timeX),
             },
             y: {
-                transform: `translateY(${yOffset.current * scaleFactor}px)`,
-                transition: `transform ${timeY}ms ease`,
+                transformPx: yOffset.current,
+                transitionMs: parseInt(timeY),
             }
         });
 
@@ -149,9 +135,22 @@ export default function Robot({ id, ref, bodyIndex, bodyStyle, moveToHome, moveT
 
             {/* Axes Animated - Axis Y is coupled in the Axis X */}
             <div
-                className="axes" style={{ zIndex: axesIndex, ...robotMovement.x }} >
+                className="axes" 
+                style={{ 
+                    zIndex: axesIndex, 
+                    transform: `translateX(${robotMovement.x.transformPx * scaleFactor}px)`, 
+                    transition: `transform ${robotMovement.x.transitionMs}ms ease` 
+                }} 
+            >
                 <RobotAxisX className="axis-x" style={{ zIndex: axisXIndex }} />
-                <RobotAxisY className="axis-y" style={{ zIndex: axisYIndex, ...robotMovement.y }} />
+                <RobotAxisY 
+                    className="axis-y" 
+                    style={{ 
+                        zIndex: axisYIndex, 
+                        transform: `translateY(${robotMovement.y.transformPx * scaleFactor}px)`, 
+                        transition: `transform ${robotMovement.y.transitionMs}ms ease` 
+                    }} 
+                />
             </div>
         </StyleRobot>
     );
