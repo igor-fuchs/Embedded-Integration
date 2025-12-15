@@ -395,7 +395,10 @@ export function PlayFactory() {
                                             isGrabbed: robotLeftMoving.isGrabbed,
                                             movement: robotLeftMovement,
                                         }}
-                                        bigConveyorRef={bigConveyorRef}
+                                        bigConveyor={{
+                                            ref: bigConveyorRef,
+                                            running: bigConveyorRunning,
+                                        }}
                                         actuatorARef={actuatorARef}
                                         actuatorBRef={actuatorBRef}
                                         actuatorCRef={actuatorCRef}

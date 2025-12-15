@@ -16,14 +16,17 @@ interface PartProps {
         isGrabbed: boolean;
         movement: RobotMovement;
     };
-    bigConveyorRef: React.RefObject<HTMLDivElement | null>;
+    bigConveyor: {
+        ref: React.RefObject<HTMLDivElement | null>;
+        running: boolean;
+    }
     actuatorARef: React.RefObject<HTMLDivElement | null>;
     actuatorBRef: React.RefObject<HTMLDivElement | null>;
     actuatorCRef: React.RefObject<HTMLDivElement | null>;
     scaleFactor: number;
 }
 
-export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyorRef, actuatorARef, actuatorBRef, actuatorCRef, scaleFactor }: PartProps) {
+export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyor, actuatorARef, actuatorBRef, actuatorCRef, scaleFactor }: PartProps) {
     const animationID = useRef<number | null>(null);
     const frameTime = useRef<number>(0);
     const partRef = useRef<HTMLDivElement>(null);
@@ -36,7 +39,7 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
     const previousRobotPosition = useRef({ x: null, y: null } as { x: number | null; y: number | null });
     const [partTransition, setPartTransition] = useState<string>('');
 
-    // Conveyor Animation Effect
+    // #region First Conveyor
     useEffect(() => {
         // Stopping unnecessary animation frames
         if (!conveyor.running || !isTouching(partRef, conveyor.ref)) {
@@ -77,8 +80,9 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
         };
 
     }, [conveyor.running]);
+    // #endregion
 
-    // Robot Movement Effect - when part is grabbed by robot
+    // #region Robot
     useEffect(() => {
         if(!robot.isGrabbed) {
             previousRobotPosition.current = { x: null, y: null };
@@ -122,6 +126,50 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
         }
 
     }, [robot.isGrabbed, robot.movement]);
+    // #endregion
+
+    // #region Big Conveyor
+    useEffect(() => {
+        // Stopping unnecessary animation frames
+        if (!bigConveyor.running || !isTouching(partRef, bigConveyor.ref)) {
+            cancelAnimationFrame(animationID.current!);
+            animationID.current = null;
+            return;
+        }
+
+        const followBigConveyor = (currentTime: number) => {
+            // Intializing the animation start time
+            if (!frameTime.current) {
+                frameTime.current = currentTime;
+            }
+
+            // Calculating time difference
+            const deltaTime = currentTime - frameTime.current;
+
+            if (deltaTime > 0) {
+                const speed = parseFloat(bigConveyor.ref.current?.dataset.speedMs || '0');
+
+                // Moving animation based on speed and time elapsed
+                setOffset(prev => ({ ...prev, y: prev.y - speed * deltaTime / scaleFactor }));
+
+                // Changing the firstTime to the current time after frame update
+                frameTime.current = currentTime;
+            }
+
+            animationID.current = requestAnimationFrame(followBigConveyor);
+        };
+
+        frameTime.current = 0;
+        animationID.current = requestAnimationFrame(followBigConveyor);
+        return () => {
+            if (animationID.current) {
+                cancelAnimationFrame(animationID.current);
+                animationID.current = null;
+            }
+        };
+
+    }, [bigConveyor.running]);
+    // #endregion
 
     return (
         <StylePart

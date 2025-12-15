@@ -1,6 +1,10 @@
 import styled from "styled-components";
 
-export const StyleBigConveyor = styled.div`
+interface BigConveyorProps {
+    $animationDurationMs: number;
+}
+
+export const StyleBigConveyor = styled.div<BigConveyorProps>`
     position: relative;
     overflow: hidden;
 
@@ -18,5 +22,15 @@ export const StyleBigConveyor = styled.div`
         position: absolute;
         display: flex;
         flex-direction: column;
+        animation: conveyorMove ${props => props.$animationDurationMs}ms linear infinite;
+    }
+
+    @keyframes conveyorMove {
+        0% {
+            transform: translateY(50%);
+        }
+        100% {
+            transform: translateY(0);
+        }
     }
 `;
