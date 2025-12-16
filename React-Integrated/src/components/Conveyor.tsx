@@ -18,12 +18,14 @@ export default function Conveyor({ id, ref, bodyIndex, bodyStyle, beltStyle, run
     const beltIndex = bodyIndex - 1;
     const animationDurationMs = 5000;
 
+    const classNameBelt = 'belt';
+
     useEffect(() => {
         if (!ref.current) return;
 
         // The animation of the conveyor moves 50% of its height in 5 seconds
-        const conveyorHeight = ref.current.offsetHeight;
-        const totalMovement = conveyorHeight * 0.5; // 50% of the height
+        const conveyorEl = ref.current.querySelector(`.${classNameBelt}`) as HTMLElement;
+        const totalMovement = conveyorEl.offsetHeight * 0.5; // 50% of the height
 
         // Speed in pixels per millisecond
         ref.current.dataset.speedMs = (totalMovement / animationDurationMs).toString();

@@ -36,6 +36,7 @@ interface PartProps {
 }
 
 export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyor, actuatorA, actuatorB, actuatorC, scaleFactor }: PartProps) {
+    // #region Refs, States, Callbacks
     const partRef = useRef<HTMLDivElement>(null);
     const [offset, setOffset] = useState({
         x: 81.5,
@@ -82,6 +83,7 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
         },
         [scaleFactor]
     );
+    // #endregion
 
     // #region First Conveyor
     useEffect(() => {
@@ -161,9 +163,10 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
 
     // #region Actuators
     useEffect(() => {
+        const anyAdvance = actuatorA.movement.advance || actuatorB.movement.advance || actuatorC.movement.advance;
 
-        // If any actuator is retracting, stop the push animation
-        if (actuatorA.movement.retract || actuatorB.movement.retract || actuatorC.movement.retract) {
+        // Stop if any actuator is retracting or none is advancing
+        if (actuatorA.movement.retract || actuatorB.movement.retract || actuatorC.movement.retract || !anyAdvance) {
             if (actuatorPushAnimationID.current) {
                 cancelAnimationFrame(actuatorPushAnimationID.current);
                 actuatorPushAnimationID.current = null;
@@ -178,7 +181,7 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
                 }
             });
 
-            if (actuatorA.movement.advance || actuatorB.movement.advance || actuatorC.movement.advance) {
+            if (anyAdvance) {
                 actuatorPushAnimationID.current = requestAnimationFrame(animatePush);
             } else {
                 actuatorPushAnimationID.current = null;
