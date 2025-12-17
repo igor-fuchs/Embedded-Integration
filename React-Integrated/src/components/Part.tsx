@@ -39,9 +39,12 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
     // #region Refs, States, Callbacks
     const partRef = useRef<HTMLDivElement>(null);
     const [offset, setOffset] = useState({
-        x: 81.5,
-        y: -170,
+        x: 0,
+        y: 0,
     });
+
+    // Frozen flag
+    const [isFinished, setIsFinished] = useState<boolean>(false);
 
     // Conveyor dependencies
     const conveyorAnimationID = useRef<number | null>(null);
@@ -60,13 +63,14 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
     // Actuator dependencies
     const pushIfColliding = useCallback(
         (actuatorRef: React.RefObject<HTMLDivElement | null>, index: number, pushForce: number = 5) => {
+            if (isFinished) return;
             if (!partRef.current || !actuatorRef.current) return;
 
             const partRect = partRef.current.getBoundingClientRect();
             const actuatorRect = actuatorRef.current.getBoundingClientRect();
 
             // Handle ramp animation triggering
-            if (rampAnimation === 0) { // Not animating yet, then avoid unnecessary calculations
+            if (rampAnimation === 0) { // 0 = Not animating yet
 
                 const rampIdMap: Record<number, string> = {
                     0: "ramp-a",
@@ -115,6 +119,7 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
 
     // #region First Conveyor
     useEffect(() => {
+        if (isFinished) return;
         followConveyorAnimation({
             conveyorRef: conveyor.ref,
             frameTime: conveyorFrameTime,
@@ -129,6 +134,7 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
 
     // #region Robot
     useEffect(() => {
+        if (isFinished) return;
         if (!robot.isGrabbed) {
             previousRobotPosition.current = { x: null, y: null };
             if (partTransition) {
@@ -177,6 +183,7 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
 
     // #region Big Conveyor
     useEffect(() => {
+        if (isFinished) return;
         followConveyorAnimation({
             conveyorRef: bigConveyor.ref,
             frameTime: bigConveyorFrameTime,
@@ -192,10 +199,11 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
 
     // #region Actuators
     useEffect(() => {
+        if (isFinished) return;
         const anyAdvance = actuatorA.movement.advance || actuatorB.movement.advance || actuatorC.movement.advance;
 
-        // Stop if any actuator is retracting or none is advancing
-        if (actuatorA.movement.retract || actuatorB.movement.retract || actuatorC.movement.retract || !anyAdvance) {
+        // Stop if any actuator is not advancing
+        if (!anyAdvance) {
             if (actuatorPushAnimationID.current) {
                 cancelAnimationFrame(actuatorPushAnimationID.current);
                 actuatorPushAnimationID.current = null;
@@ -231,6 +239,7 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
 
     // #region Ramp
     useEffect(() => {
+        if (isFinished) return;
         if (rampAnimation === 0) return;
         if (!partRef.current || !bigConveyor.ref.current) return;
 
@@ -275,6 +284,7 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
                 ...prev,
                 y: prev.y + (15 / scaleFactor),
             }));
+            setIsFinished(true);
         }, animationTimeMs + 100); // Wait for the first animation to complete
 
         return () => clearTimeout(timeoutId);

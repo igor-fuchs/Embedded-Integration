@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from "react-i18next";
 import BigConveyor from './BigConveyor';
 import Conveyor from './Conveyor';
-import Robot, {type RobotMovement} from './Robot';
+import Robot, { type RobotMovement } from './Robot';
 import Actuator from './Actuator';
 import Part from './Part';
 import PlayButtonIcon from '../assets/icons/play-button-icon.svg';
@@ -14,11 +14,32 @@ import FactoryBackground from '../assets/images/factory-background.svg';
 const BASE_WIDTH = 1024;
 const BASE_HEIGHT = 590;
 
+// Parts state management
+interface PartData {
+    id: number;
+    position: 'left' | 'right';
+}
+
 export function PlayFactory() {
+    // #region Test States
     // Test variables after delete
     const [bigConveyorRunning, setBigConveyorRunning] = useState<boolean>(false);
     const [conveyorLeftRunning, setConveyorLeftRunning] = useState<boolean>(false);
+    const [conveyorRightRunning, setConveyorRightRunning] = useState<boolean>(false);
     const [robotLeftMoving, setRobotLeftMoving] = useState<{
+        toHome: boolean;
+        toPick: boolean;
+        toAntecipation: boolean;
+        toDrop: boolean;
+        isGrabbed: boolean;
+    }>({
+        toHome: false,
+        toPick: false,
+        toAntecipation: false,
+        toDrop: false,
+        isGrabbed: false,
+    });
+    const [robotRightMoving, setRobotRightMoving] = useState<{
         toHome: boolean;
         toPick: boolean;
         toAntecipation: boolean;
@@ -34,6 +55,7 @@ export function PlayFactory() {
     const [actuatorAMoving, setActuatorAMoving] = useState<{ retract: boolean, advance: boolean }>({ retract: false, advance: false });
     const [actuatorBMoving, setActuatorBMoving] = useState<{ retract: boolean, advance: boolean }>({ retract: false, advance: false });
     const [actuatorCMoving, setActuatorCMoving] = useState<{ retract: boolean, advance: boolean }>({ retract: false, advance: false });
+
     const styleTestButtons = (value: boolean): React.CSSProperties => ({
         padding: '10px 10px',
         backgroundColor: value ? 'rgba(76, 175, 80, 0.7)' : 'rgba(200, 200, 200, 0.5)',
@@ -45,10 +67,15 @@ export function PlayFactory() {
         fontWeight: 'bold',
     });
 
+    // #endregion
+
+    // #region States, Refs
     const { t } = useTranslation();
     const [simulationStart, setSimulationStart] = useState<boolean>(false);
     const [screenHeight, setScreenHeight] = useState<number>(BASE_HEIGHT);
+    const [parts, setParts] = useState<PartData[]>([]);
     const screenRef = useRef<HTMLDivElement>(null);
+    const nextPartId = useRef<number>(0);
 
     // Equipament auxs
     const [robotLeftMovement, setRobotLeftMovement] = useState<RobotMovement>({
@@ -79,6 +106,20 @@ export function PlayFactory() {
     const actuatorCRef = useRef<HTMLDivElement>(null);
     const actuatorBRef = useRef<HTMLDivElement>(null);
     const actuatorARef = useRef<HTMLDivElement>(null);
+
+    // #endregion
+
+    // #region Functions, Callbacks
+
+    // Function to create 2 parts
+    const createTwoParts = () => {
+        const newParts: PartData[] = [
+            { id: nextPartId.current, position: 'left' },
+            { id: nextPartId.current + 1, position: 'right' }
+        ];
+        setParts(prev => [...prev, ...newParts]);
+        nextPartId.current += 2;
+    };
 
     // Function to calculate the scale coefficient
     const getScaleCoefficient = () => {
@@ -125,7 +166,9 @@ export function PlayFactory() {
         window.addEventListener('resize', updateDimensions);
         return () => window.removeEventListener('resize', updateDimensions);
     }, []);
+    // #endregion
 
+    // #region Component Render
     return (
         <StylePlayFactory height={screenHeight} ref={screenRef}>
             {/* Window Controls */}
@@ -139,99 +182,302 @@ export function PlayFactory() {
             <div style={{
                 position: 'absolute',
                 top: '20px',
+                left: '20px',
+                zIndex: 9999,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px'
+            }}>
+                {/* Left Conveyor Control */}
+                <button
+                    onClick={() => setConveyorLeftRunning(!conveyorLeftRunning)}
+                    style={{
+                        padding: '10px 15px',
+                        backgroundColor: conveyorLeftRunning ? 'rgba(76, 175, 80, 0.7)' : 'rgba(200, 200, 200, 0.5)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontWeight: 'bold',
+                        minWidth: '150px',
+                    }}
+                >
+                    Left Conveyor: {conveyorLeftRunning ? 'ON' : 'OFF'}
+                </button>
+
+                {/* Left Robot Home Control */}
+                <button
+                    onClick={() => setRobotLeftMoving({ ...robotLeftMoving, toHome: !robotLeftMoving.toHome })}
+                    style={{
+                        padding: '10px 15px',
+                        backgroundColor: robotLeftMoving.toHome ? 'rgba(76, 175, 80, 0.7)' : 'rgba(200, 200, 200, 0.5)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontWeight: 'bold',
+                        minWidth: '150px',
+                    }}
+                >
+                    Left Robot Home: {robotLeftMoving.toHome ? 'ON' : 'OFF'}
+                </button>
+
+                {/* Left Robot Pick Control */}
+                <button
+                    onClick={() => setRobotLeftMoving({ ...robotLeftMoving, toPick: !robotLeftMoving.toPick })}
+                    style={{
+                        padding: '10px 15px',
+                        backgroundColor: robotLeftMoving.toPick ? 'rgba(76, 175, 80, 0.7)' : 'rgba(200, 200, 200, 0.5)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontWeight: 'bold',
+                        minWidth: '150px',
+                    }}
+                >
+                    Left Robot Pick: {robotLeftMoving.toPick ? 'ON' : 'OFF'}
+                </button>
+
+                {/* Left Robot Antecipation Control */}
+                <button
+                    onClick={() => setRobotLeftMoving({ ...robotLeftMoving, toHome: !robotLeftMoving.toAntecipation })}
+                    style={{
+                        padding: '10px 15px',
+                        backgroundColor: robotLeftMoving.toAntecipation ? 'rgba(76, 175, 80, 0.7)' : 'rgba(200, 200, 200, 0.5)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontWeight: 'bold',
+                        minWidth: '150px',
+                    }}
+                >
+                    Left Robot Antecipation: {robotLeftMoving.toAntecipation ? 'ON' : 'OFF'}
+                </button>
+
+                {/* Left Robot Drop Control */}
+                <button
+                    onClick={() => setRobotLeftMoving({ ...robotLeftMoving, toDrop: !robotLeftMoving.toDrop })}
+                    style={{
+                        padding: '10px 15px',
+                        backgroundColor: robotLeftMoving.toDrop ? 'rgba(76, 175, 80, 0.7)' : 'rgba(200, 200, 200, 0.5)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontWeight: 'bold',
+                        minWidth: '150px',
+                    }}
+                >
+                    Left Robot Drop: {robotLeftMoving.toDrop ? 'ON' : 'OFF'}
+                </button>
+
+                {/* Left Robot Grab */}
+                <button
+                    onClick={() => setRobotLeftMoving({ ...robotLeftMoving, isGrabbed: !robotLeftMoving.isGrabbed })}
+                    style={{
+                        padding: '10px 15px',
+                        backgroundColor: robotLeftMoving.isGrabbed ? 'rgba(76, 175, 80, 0.7)' : 'rgba(200, 200, 200, 0.5)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontWeight: 'bold',
+                        minWidth: '150px',
+                    }}
+                >
+                    Left Robot Grab: {robotLeftMoving.isGrabbed ? 'ON' : 'OFF'}
+                </button>
+
+                {/* SPACE BETWEEN */}
+                <button
+                    style={{
+                        padding: '10px 15px',
+                        backgroundColor: 'transparent',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontWeight: 'bold',
+                        minWidth: '150px',
+                    }}
+                >
+                   
+                </button>
+
+                {/* Right Conveyor Control */}
+                <button
+                    onClick={() => setConveyorRightRunning(!conveyorRightRunning)}
+                    style={{
+                        padding: '10px 15px',
+                        backgroundColor: conveyorRightRunning ? 'rgba(76, 175, 80, 0.7)' : 'rgba(200, 200, 200, 0.5)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontWeight: 'bold',
+                        minWidth: '150px',
+                    }}
+                >
+                    Right Conveyor: {conveyorRightRunning ? 'ON' : 'OFF'}
+                </button>
+
+                {/* Right Robot Home Control */}
+                <button
+                    onClick={() => setRobotRightMoving({ ...robotRightMoving, toHome: !robotRightMoving.toHome })}
+                    style={{
+                        padding: '10px 15px',
+                        backgroundColor: robotRightMoving.toHome ? 'rgba(76, 175, 80, 0.7)' : 'rgba(200, 200, 200, 0.5)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontWeight: 'bold',
+                        minWidth: '150px',
+                    }}
+                >
+                    Right Robot Home: {robotRightMoving.toHome ? 'ON' : 'OFF'}
+                </button>
+
+                {/* Right Robot Pick Control */}
+                <button
+                    onClick={() => setRobotRightMoving({ ...robotRightMoving, toPick: !robotRightMoving.toPick })}
+                    style={{
+                        padding: '10px 15px',
+                        backgroundColor: robotRightMoving.toPick ? 'rgba(76, 175, 80, 0.7)' : 'rgba(200, 200, 200, 0.5)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontWeight: 'bold',
+                        minWidth: '150px',
+                    }}
+                >
+                    Right Robot Pick: {robotRightMoving.toPick ? 'ON' : 'OFF'}
+                </button>
+
+                {/* Right Robot Antecipation Control */}
+                <button
+                    onClick={() => setRobotRightMoving({ ...robotRightMoving, toAntecipation: !robotRightMoving.toAntecipation })}
+                    style={{
+                        padding: '10px 15px',
+                        backgroundColor: robotRightMoving.toAntecipation ? 'rgba(76, 175, 80, 0.7)' : 'rgba(200, 200, 200, 0.5)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontWeight: 'bold',
+                        minWidth: '150px',
+                    }}
+                >
+                    Right Robot Antecipation: {robotRightMoving.toAntecipation ? 'ON' : 'OFF'}
+                </button>
+
+                {/* Right Robot Drop Control */}
+                <button
+                    onClick={() => setRobotRightMoving({ ...robotRightMoving, toDrop: !robotRightMoving.toDrop })}
+                    style={{
+                        padding: '10px 15px',
+                        backgroundColor: robotRightMoving.toDrop ? 'rgba(76, 175, 80, 0.7)' : 'rgba(200, 200, 200, 0.5)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontWeight: 'bold',
+                        minWidth: '150px',
+                    }}
+                >
+                    Right Robot Drop: {robotRightMoving.toDrop ? 'ON' : 'OFF'}
+                </button>
+
+                {/* Right Robot Grab */}
+                <button
+                    onClick={() => setRobotRightMoving({ ...robotRightMoving, isGrabbed: !robotRightMoving.isGrabbed })}
+                    style={{
+                        padding: '10px 15px',
+                        backgroundColor: robotRightMoving.isGrabbed ? 'rgba(76, 175, 80, 0.7)' : 'rgba(200, 200, 200, 0.5)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontWeight: 'bold',
+                        minWidth: '150px',
+                    }}
+                >
+                    Right Robot Grab: {robotRightMoving.isGrabbed ? 'ON' : 'OFF'}
+                </button>
+            </div>
+
+            <div style={{
+                position: 'absolute',
+                top: '20px',
                 right: '20px',
                 zIndex: 9999,
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '10px'
             }}>
-                {/* Conveyor Left Running Button */}
-                <button
-                    onClick={() => setConveyorLeftRunning(!conveyorLeftRunning)}
-                    style={styleTestButtons(conveyorLeftRunning)}
-                >
-                    Conveyor Left: {conveyorLeftRunning ? 'ON' : 'OFF'}
-                </button>
-
-                {/* Robot Left - toHome Button */}
-                <button
-                    onClick={() => setRobotLeftMoving({ ...robotLeftMoving, toHome: !robotLeftMoving.toHome })}
-                    style={styleTestButtons(robotLeftMoving.toHome)}
-                >
-                    Robot toHome: {robotLeftMoving.toHome ? 'ON' : 'OFF'}
-                </button>
-
-                {/* Robot Left - toPick Button */}
-                <button
-                    onClick={() => setRobotLeftMoving({ ...robotLeftMoving, toPick: !robotLeftMoving.toPick })}
-                    style={styleTestButtons(robotLeftMoving.toPick)}
-                >
-                    Robot toPick: {robotLeftMoving.toPick ? 'ON' : 'OFF'}
-                </button>
-
-                {/* Robot Left - toAntecipation Button */}
-                <button
-                    onClick={() => setRobotLeftMoving({ ...robotLeftMoving, toAntecipation: !robotLeftMoving.toAntecipation })}
-                    style={styleTestButtons(robotLeftMoving.toAntecipation)}
-                >
-                    Robot toAntecipation: {robotLeftMoving.toAntecipation ? 'ON' : 'OFF'}
-                </button>
-
-                {/* Robot Left - toDrop Button */}
-                <button
-                    onClick={() => setRobotLeftMoving({ ...robotLeftMoving, toDrop: !robotLeftMoving.toDrop })}
-                    style={styleTestButtons(robotLeftMoving.toDrop)}
-                >
-                    Robot toDrop: {robotLeftMoving.toDrop ? 'ON' : 'OFF'}
-                </button>
-                {/* Robot Left - isGrabbed */}
-                <button
-                    onClick={() => setRobotLeftMoving({ ...robotLeftMoving, isGrabbed: !robotLeftMoving.isGrabbed })}
-                    style={styleTestButtons(robotLeftMoving.isGrabbed)}
-                >
-                    Robot isGrabbed: {robotLeftMoving.isGrabbed ? 'ON' : 'OFF'}
-                </button>
+                {/* Big Conveyor Running Button */}
                 <button
                     onClick={() => setBigConveyorRunning(!bigConveyorRunning)}
                     style={styleTestButtons(bigConveyorRunning)}
                 >
-                    Big Conveyor Running: {bigConveyorRunning ? 'ON' : 'OFF'}
+                    Big Conveyor: {bigConveyorRunning ? 'ON' : 'OFF'}
                 </button>
+
+                {/* Actuator A Advance Button */}
                 <button
-                    onClick={() => setActuatorAMoving({ ...actuatorAMoving, advance: !actuatorAMoving.advance})}
+                    onClick={() => setActuatorAMoving({ ...actuatorAMoving, advance: !actuatorAMoving.advance, retract: actuatorAMoving.advance })}
                     style={styleTestButtons(actuatorAMoving.advance)}
                 >
-                    Actuator A Advance: {actuatorAMoving.advance ? 'ON' : 'OFF'}
+                    Actuator A: {actuatorAMoving.advance ? 'ON' : 'OFF'}
                 </button>
+
+                {/* Actuator B Advance Button */}
                 <button
-                    onClick={() => setActuatorAMoving({ ...actuatorAMoving, retract: !actuatorAMoving.retract})}
-                    style={styleTestButtons(actuatorAMoving.retract)}
-                >
-                    Actuator A Retract: {actuatorAMoving.retract ? 'ON' : 'OFF'}
-                </button>
-                <button
-                    onClick={() => setActuatorBMoving({ ...actuatorBMoving, advance: !actuatorBMoving.advance})}
+                    onClick={() => setActuatorBMoving({ ...actuatorBMoving, advance: !actuatorBMoving.advance, retract: actuatorBMoving.advance })}
                     style={styleTestButtons(actuatorBMoving.advance)}
                 >
-                    Actuator B Advance: {actuatorBMoving.advance ? 'ON' : 'OFF'}
+                    Actuator B: {actuatorBMoving.advance ? 'ON' : 'OFF'}
                 </button>
+
+                {/* Actuator C Advance Button */}
                 <button
-                    onClick={() => setActuatorBMoving({ ...actuatorBMoving, retract: !actuatorBMoving.retract})}
-                    style={styleTestButtons(actuatorBMoving.retract)}
-                >
-                    Actuator B Retract: {actuatorBMoving.retract ? 'ON' : 'OFF'}
-                </button>
-                <button
-                    onClick={() => setActuatorCMoving({ ...actuatorCMoving, advance: !actuatorCMoving.advance})}
+                    onClick={() => setActuatorCMoving({ ...actuatorCMoving, advance: !actuatorCMoving.advance, retract: actuatorCMoving.advance })}
                     style={styleTestButtons(actuatorCMoving.advance)}
                 >
-                    Actuator C Advance: {actuatorCMoving.advance ? 'ON' : 'OFF'}
+                    Actuator C: {actuatorCMoving.advance ? 'ON' : 'OFF'}
                 </button>
+
+                {/* Create Parts Trigger */}
                 <button
-                    onClick={() => setActuatorCMoving({ ...actuatorCMoving, retract: !actuatorCMoving.retract})}
-                    style={styleTestButtons(actuatorCMoving.retract)}
+                    onClick={createTwoParts}
+                    style={{
+                        padding: '10px 10px',
+                        backgroundColor: 'rgba(33, 150, 243, 0.7)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontWeight: 'bold',
+                    }}
                 >
-                    Actuator C Retract: {actuatorCMoving.retract ? 'ON' : 'OFF'}
+                    Create 2 Parts ({parts.length} total)
                 </button>
 
             </div>
@@ -304,7 +550,7 @@ export function PlayFactory() {
                                         bodyIndex={89}
                                         bodyStyle={equipamentStyle({ width: 68, height: 253, right: 388, bottom: 19 })}
                                         beltStyle={equipamentStyle({ width: 68, bottom: 31, right: 0 })}
-                                        running={false}
+                                        running={conveyorRightRunning}
                                         scaleFactor={getScaleCoefficient()}
                                     />
                                     <Robot
@@ -312,10 +558,10 @@ export function PlayFactory() {
                                         ref={robotRightRef}
                                         bodyIndex={99}
                                         bodyStyle={equipamentStyle({ width: 153, height: 125, right: 275, bottom: 209 })}
-                                        moveToHome={true}
-                                        moveToPick={false}
-                                        moveToAntecipation={false}
-                                        moveToDrop={false}
+                                        moveToHome={robotRightMoving.toHome}
+                                        moveToPick={robotRightMoving.toPick}
+                                        moveToAntecipation={robotRightMoving.toAntecipation}
+                                        moveToDrop={robotRightMoving.toDrop}
                                         setRobotMovement={setRobotRightMovement}
                                         robotMovement={robotRightMovement}
                                         scaleFactor={getScaleCoefficient()}
@@ -364,37 +610,45 @@ export function PlayFactory() {
                                     />
                                 </section>
 
-                                <section className='Parts'>
-                                    <Part
-                                        bodyIndex={90}
-                                        bodyStyle={equipamentStyle({ width: 20, height: 20, left: 430, bottom: 36 })}
-                                        conveyor={{
-                                            ref: conveyorLeftRef,
-                                            running: conveyorLeftRunning,
-                                        }}
-                                        robot={{
-                                            ref: robotLeftRef,
-                                            isGrabbed: robotLeftMoving.isGrabbed,
-                                            movement: robotLeftMovement,
-                                        }}
-                                        bigConveyor={{
-                                            ref: bigConveyorRef,
-                                            running: bigConveyorRunning,
-                                        }}
-                                        actuatorA={{
-                                            ref: actuatorARef,
-                                            movement: actuatorAMoving
-                                        }}
-                                        actuatorB={{
-                                            ref: actuatorBRef,
-                                            movement: actuatorBMoving
-                                        }}
-                                        actuatorC={{
-                                            ref: actuatorCRef,
-                                            movement: actuatorCMoving
-                                        }}
-                                        scaleFactor={getScaleCoefficient()}
-                                    />
+                                <section className='parts'>
+                                    {parts.map((part) => (
+                                        <Part
+                                            key={part.id}
+                                            bodyIndex={90}
+                                            bodyStyle={equipamentStyle({
+                                                width: 20,
+                                                height: 20,
+                                                ...(part.position === 'left' ? { left: 430 } : { right: 410 }),
+                                                bottom: 36
+                                            })}
+                                            conveyor={{
+                                                ref: part.position === 'left' ? conveyorLeftRef : conveyorRightRef,
+                                                running: part.position === 'left' ? conveyorLeftRunning : conveyorRightRunning,
+                                            }}
+                                            robot={{
+                                                ref: part.position === 'left' ? robotLeftRef : robotRightRef,
+                                                isGrabbed: part.position === 'left' ? robotLeftMoving.isGrabbed : robotRightMoving.isGrabbed,
+                                                movement: part.position === 'left' ? robotLeftMovement : robotRightMovement,
+                                            }}
+                                            bigConveyor={{
+                                                ref: bigConveyorRef,
+                                                running: bigConveyorRunning,
+                                            }}
+                                            actuatorA={{
+                                                ref: actuatorARef,
+                                                movement: actuatorAMoving
+                                            }}
+                                            actuatorB={{
+                                                ref: actuatorBRef,
+                                                movement: actuatorBMoving
+                                            }}
+                                            actuatorC={{
+                                                ref: actuatorCRef,
+                                                movement: actuatorCMoving
+                                            }}
+                                            scaleFactor={getScaleCoefficient()}
+                                        />
+                                    ))}
                                 </section>
                             </div>
                         </>
@@ -403,4 +657,5 @@ export function PlayFactory() {
             }
         </StylePlayFactory>
     );
+    // #endregion
 }
