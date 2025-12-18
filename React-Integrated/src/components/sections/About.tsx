@@ -1,7 +1,7 @@
-import { StyleAbout } from "./styles/About";
-import IndustrialIcon from "../assets/icons/industrial-icon.svg";
-import WebInterfaceIcon from "../assets/icons/web-interface-icon.svg";
-import logo from '../assets/logo.svg';
+import { StyleAbout } from "../.styles/About";
+import IndustrialIcon from "../../assets/icons/industrial-icon.svg";
+import WebInterfaceIcon from "../../assets/icons/web-interface-icon.svg";
+import logo from '../../assets/logo.svg';
 import StatusIndicator from "./StatusIndicator";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";

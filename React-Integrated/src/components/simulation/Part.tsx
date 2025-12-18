@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, useRef } from 'react';
-import { StylePart } from './styles/Part';
-import { followConveyorAnimation, isTouching } from './lib/PartLib';
-import GreenPart from '../assets/images/green-part.svg?react';
+import { StylePart } from '../.styles/Part';
+import { followConveyorAnimation, isTouching } from '../.lib/PartLib';
+import GreenPart from '../../assets/images/green-part.svg?react';
 import type { RobotMovement } from './Robot';
 
 interface PartProps {

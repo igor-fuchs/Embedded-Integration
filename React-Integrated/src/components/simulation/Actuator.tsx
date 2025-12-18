@@ -1,8 +1,8 @@
-import { StyleActuator } from "./styles/Actuator";
+import { StyleActuator } from "../.styles/Actuator";
 import { useEffect, useState } from "react";
-import ActuatorBody from "../assets/images/actuator-body.svg?react";
-import ActuatorRod from "../assets/images/actuator-rod.svg?react";
-import ActuatorPiston from "../assets/images/actuator-piston.svg?react";
+import ActuatorBody from "../../assets/images/actuator-body.svg?react";
+import ActuatorRod from "../../assets/images/actuator-rod.svg?react";
+import ActuatorPiston from "../../assets/images/actuator-piston.svg?react";
 
 interface ActuatorProps {
     id: string;
