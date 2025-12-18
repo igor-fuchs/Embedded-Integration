@@ -1,10 +1,7 @@
-namespace Bridge.Config;
+namespace OpcUa.Mapping;
 
-public static class Config
+public static class OpcNodes
 {
-    public static Uri OPCUA_ENDPOINT { get; } = new Uri("opc.tcp://192.168.1.20:4840");
-    public static string WEBSOCKET_PREFIX { get; } = "http://localhost:5000/ws/";
-
     // NodeIds carregados a partir do arquivo de sinais usados
     public static List<string> NODE_IDS_TO_MONITOR { get; } = new List<string>
         {
