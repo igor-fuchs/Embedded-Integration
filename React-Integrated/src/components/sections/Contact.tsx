@@ -16,12 +16,12 @@ export default function Contact() {
                     </p>
 
                     <div className="action-buttons">
-                        <button className="btn-repository" onClick={() => window.open("https://github.com/igor-fuchs", "_blank")}>
+                        <button data-testid="btn-repository" className="btn-repository" onClick={() => window.open("https://github.com/igor-fuchs", "_blank")}>
                             <img src={GithubIcon} alt="GitHub Repository" />
                             {t('ViewRepository')}
                         </button>
 
-                        <button className="btn-contact">
+                        <button data-testid="btn-contact" className="btn-contact">
                             <img src={ContactIcon} alt="Contact Icon" />
                             {t('ContactMe')}
                         </button>
