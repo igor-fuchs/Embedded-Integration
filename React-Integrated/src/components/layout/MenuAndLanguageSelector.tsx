@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import i18n, { languagesAvailable } from "../../util/translation";
+import i18n, { languagesAvailable } from "@utils/translation";
 import { StyleMenuAndLanguageSelector } from "@styles/MenuAndLanguageSelector";
 import useOnClickOutside from "../../hooks/useOnClickOutside";
 import WebInterfaceIcon from "../../assets/icons/web-interface-icon.svg?react";

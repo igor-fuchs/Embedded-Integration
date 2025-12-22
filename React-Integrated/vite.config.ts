@@ -15,6 +15,7 @@ export default defineConfig({
       '@simulation': path.resolve(__dirname, 'src/components/simulation'),
       '@lib': path.resolve(__dirname, 'src/lib'),
       '@styles': path.resolve(__dirname, 'src/styles'),
+      '@utils': path.resolve(__dirname, 'src/utils'),
     },
   },
 })

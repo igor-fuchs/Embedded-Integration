@@ -36,6 +36,7 @@
       "@simulation/*": ["src/components/simulation/*"],
       "@lib/*": ["src/lib/*"],
       "@styles/*": ["src/styles/*"],
+      "@utils/*": ["src/utils/*"]
     }
   },
   "include": ["src"]
