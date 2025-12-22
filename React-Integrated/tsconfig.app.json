@@ -34,6 +34,7 @@
       "@layout/*": ["src/components/layout/*"],
       "@sections/*": ["src/components/sections/*"],
       "@simulation/*": ["src/components/simulation/*"],
+      "@hooks/*": ["src/hooks/*"],
       "@lib/*": ["src/lib/*"],
       "@styles/*": ["src/styles/*"],
       "@utils/*": ["src/utils/*"]
