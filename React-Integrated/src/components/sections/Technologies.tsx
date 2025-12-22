@@ -1,5 +1,5 @@
-import { StyleTechnologies } from "../.styles/Technologies";
-import { listCards } from "../.lib/TechnologiesLib";
+import { StyleTechnologies } from "@styles/Technologies";
+import { listCards } from "../../lib/TechnologiesLib";
 import { useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 

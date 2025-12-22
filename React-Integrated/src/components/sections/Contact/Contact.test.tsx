@@ -1,7 +1,7 @@
+import Contact, { LINKS } from './Contact'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import Contact from '../Contact'
 
 describe('Contact Component', () => {
   beforeEach(() => {
@@ -13,83 +13,84 @@ describe('Contact Component', () => {
 
   describe('Render', () => {
     it('Rendering title', () => {
-      expect(screen.getByText('Contact')).toBeInTheDocument()
-
-    })
+      expect(screen.getByText('Contact')).toBeInTheDocument();
+    });
 
     it('Rendering subtitle', () => {
-      expect(screen.getByText('ContactSubtitle')).toBeInTheDocument()
-    })
+      expect(screen.getByText('ContactSubtitle')).toBeInTheDocument();
+    });
 
     it('Rendering collaboration card', () => {
-      expect(screen.getByText('ConnectCollaborate')).toBeInTheDocument() // title
-      expect(screen.getByText('ConnectCollaborateDescription')).toBeInTheDocument() // description
-    })
+      expect(screen.getByText('ConnectCollaborate')).toBeInTheDocument();
+      expect(screen.getByText('ConnectCollaborateDescription')).toBeInTheDocument();
+    });
 
     it('Rendering action buttons', () => {
-      expect(screen.getByTestId('btn-repository')).toBeInTheDocument()
-      expect(screen.getByTestId('btn-contact')).toBeInTheDocument()
-    })
-  })
+      expect(screen.getByTestId('btn-repository')).toBeInTheDocument();
+      expect(screen.getByTestId('btn-contact')).toBeInTheDocument();
+    });
+  });
 
   describe('Interactions', () => {
-    it('Open the GitHub repository in a new tab when clicking the button', async () => {
-      const user = userEvent.setup()
-      const openSpy = vi.spyOn(window, 'open')
+    it('Open the GitHub repository in a new tab', async () => {
+      const user = userEvent.setup();
 
-      const githubButton = screen.getByTestId('btn-repository')
-      await user.click(githubButton)
+      const githubButton = screen.getByTestId('btn-repository');
+      await user.click(githubButton);
 
-      expect(openSpy).toHaveBeenCalledWith( // melhorar verificação da URL
-        'https://github.com/igor-fuchs',
-        '_blank'
-      )
-    })
+      expect(window.open).toHaveBeenCalledWith(
+        LINKS.GITHUB,
+        "_blank"
+      );
+    });
 
-    it('botão de contato é clicável', async () => {
-      const user = userEvent.setup()
+    it('Open contact me in a new tab', async () => {
+      const user = userEvent.setup();
 
-      const contactButton = screen.getByRole('button', { name: /contact me/i })
-      await user.click(contactButton)
+      const contactButton = screen.getByTestId('btn-contact');
+      await user.click(contactButton);
 
-      // Se tiver lógica no futuro, adicione expect aqui
-      expect(contactButton).toBeInTheDocument()
-    })
-  })
+      expect(window.open).toHaveBeenCalledWith(
+        LINKS.EMAIL,
+        "_blank"
+      );
+    });
 
-  describe('Acessibilidade', () => {
-    it('link do LinkedIn tem aria-label', () => {
-      const linkedinLink = screen.getByLabelText('LinkedIn')
-      expect(linkedinLink).toBeInTheDocument()
-    })
+    it('Open LinkedIn link in a new tab', async () => {
+      const user = userEvent.setup();
 
-    it('link do LinkedIn abre em nova aba', () => {
-      const linkedinLink = screen.getByLabelText('LinkedIn')
-      expect(linkedinLink).toHaveAttribute('target', '_blank')
-      expect(linkedinLink).toHaveAttribute('href', 'https://www.linkedin.com/in/igor-fuchs-pereira/')
-    })
+      const linkedinButton = screen.getByTestId('btn-linkedin');
+      await user.click(linkedinButton);
 
-    it('imagens têm texto alternativo', () => {
-      expect(screen.getByAltText('GitHub Repository')).toBeInTheDocument()
-      expect(screen.getByAltText('Contact Icon')).toBeInTheDocument()
-    })
+      expect(window.open).toHaveBeenCalledWith(
+        LINKS.LINKEDIN,
+        "_blank"
+      );
+    });
+  });
 
-    it('tem um id para navegação', () => {
-      const { container } = render(<Contact />) // melhorar a renderização para este teste
-      const section = container.querySelector('#Contact')
-      expect(section).toBeInTheDocument()
-    })
-  })
+  describe('Accessibility', () => {
+    it('Repository button has accessible name', () => {
+      expect(
+        screen.getByRole('button', { name: /ViewRepository/i })
+      ).toBeInTheDocument()
+    });
 
-  describe('Estrutura', () => {
-    it('renderiza dentro do StyleContact', () => {
-      const { container } = render(<Contact />) // melhorar a renderização para este teste
-      expect(container.querySelector('#Contact')).toBeInTheDocument()
-    })
+    it('Contact button has accessible name', () => {
+      expect(
+        screen.getByRole('button', { name: /ContactMe/i })
+      ).toBeInTheDocument()
+    });
 
-    it('renderiza o container de contato', () => {
-      const { container } = render(<Contact />) // melhorar a renderização para este teste
-      expect(container.querySelector('.contact-container')).toBeInTheDocument()
-    })
-  })
+    it('LinkedIn button has accessible name', () => {
+      expect(
+        screen.getByRole('button', { name: /Open LinkedIn/i })
+      ).toBeInTheDocument()
+    });
+
+    it('Section has an id to scroll to', () => {
+      const section = screen.getByTestId('contact-section');
+      expect(section).toHaveAttribute('id', 'Contact');
+    });
+  });
 })

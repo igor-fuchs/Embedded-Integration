@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
-import i18n from './util/translation';
-import Header from './components/layout/Header';
+import i18n from '@utils/translation';
+import Header from '@layout/Header';
 import Home from './pages/Home';
-import Footer from './components/layout/Footer';
+import Footer from '@layout/Footer';
 import "./App.css";
 
 function App() {

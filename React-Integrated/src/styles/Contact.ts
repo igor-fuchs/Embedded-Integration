@@ -30,7 +30,7 @@ export const StyleContact = styled.section`
         margin: 0;
         color: #60a5fa;
         text-align: center;
-        
+
         font-size: 48px;
         font-weight: 700;
         line-height: 48px;
@@ -40,7 +40,7 @@ export const StyleContact = styled.section`
         margin: 0;
         color: #94a3b8;
         text-align: center;
-        
+
         font-size: 20px;
         font-weight: 400;
         line-height: 28px;
@@ -63,7 +63,7 @@ export const StyleContact = styled.section`
         gap: 12px;
         padding: 18px 32px;
         border-radius: 12px;
-        
+
         font-size: 18px;
         font-weight: 600;
         line-height: normal;
@@ -135,7 +135,7 @@ export const StyleContact = styled.section`
         margin: 0;
         color: #fff;
         text-align: center;
-        
+
         font-size: 20px;
         font-weight: 600;
         line-height: normal;
@@ -145,7 +145,7 @@ export const StyleContact = styled.section`
         margin: 0;
         color: #cbd5e1;
         text-align: center;
-        
+
         font-size: 16px;
         font-weight: 400;
         line-height: normal;
@@ -157,15 +157,22 @@ export const StyleContact = styled.section`
         justify-content: center;
         align-items: center;
         gap: 24px;
+
+        button {
+            padding: 0;
+            margin: 0;
+            border: none;
+            background-color: transparent;
+            cursor: pointer;
+        }
     }
 
-    .social-link {
+    .btn-linkedin {
         display: flex;
         align-items: center;
         justify-content: center;
         width: 32px;
         height: 32px;
-        cursor: pointer;
         transition: all 0.3s ease;
 
         svg {
@@ -184,7 +191,6 @@ export const StyleContact = styled.section`
     }
 
     @media (max-width: 1024px) {
-
         .section-title {
             font-size: 40px;
             line-height: 40px;
@@ -197,7 +203,6 @@ export const StyleContact = styled.section`
     }
 
     @media (max-width: 768px) {
-
         .contact-content {
             gap: 40px;
         }
@@ -237,7 +242,6 @@ export const StyleContact = styled.section`
     }
 
     @media (max-width: 640px) {
-
         .contact-content {
             gap: 36px;
             padding: 64px 40px;
@@ -272,7 +276,6 @@ export const StyleContact = styled.section`
     }
 
     @media (max-width: 480px) {
-
         .contact-content {
             gap: 32px;
             padding: 40px 20px;

@@ -1,10 +1,10 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
-import brFlag from "../assets/translates/icons/br-flag.svg";
-import usFlag from "../assets/translates/icons/us-flag.svg";
-import enTranslation from "../assets/translates/enTranslation.json";
-import ptTranslation from "../assets/translates/ptTranslation.json";
+import brFlag from "@assets/translates/icons/br-flag.svg";
+import usFlag from "@assets/translates/icons/us-flag.svg";
+import enTranslation from "@assets/translates/enTranslation.json";
+import ptTranslation from "@assets/translates/ptTranslation.json";
 
 type Language = {
     code: string;

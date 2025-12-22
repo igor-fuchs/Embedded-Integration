@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { hexToRgba } from '../../util/colors';
+import { hexToRgba } from "@utils/colors";
 
 interface StatusIndicatorProps {
     color: string;

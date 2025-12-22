@@ -1,4 +1,4 @@
-import { StylePlayFactory } from '../.styles/PlayFactory';
+import { StylePlayFactory } from '@styles/PlayFactory';
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from "react-i18next";
 import BigConveyor from './BigConveyor';
@@ -6,8 +6,8 @@ import Conveyor from './Conveyor';
 import Robot, { type RobotMovement } from './Robot';
 import Actuator from './Actuator';
 import Part from './Part';
-import PlayButtonIcon from '../../assets/icons/play-button-icon.svg';
-import FactoryBackground from '../../assets/images/factory-background.svg';
+import PlayButtonIcon from '@assets/icons/play-button-icon.svg';
+import FactoryBackground from '@assets/images/factory-background.svg';
 
 // Adicionar um efeito de sombra no arco da esteira para dar profundidade 
 

@@ -1,11 +1,11 @@
-import { StyleRobot } from "../.styles/Robot"
+import { StyleRobot } from "@styles/Robot"
 import React, { useEffect, useRef } from "react";
-import RobotRightBody from "../../assets/images/robot-right-body.svg?react";
-import RobotRightAxisX from "../../assets/images/robot-right-axis-x.svg?react";
-import RobotRightAxisY from "../../assets/images/robot-right-axis-y.svg?react";
-import RobotLeftBody from "../../assets/images/robot-left-body.svg?react";
-import RobotLeftAxisX from "../../assets/images/robot-left-axis-x.svg?react";
-import RobotLeftAxisY from "../../assets/images/robot-left-axis-y.svg?react";
+import RobotRightBody from "@assets/images/robot-right-body.svg?react";
+import RobotRightAxisX from "@assets/images/robot-right-axis-x.svg?react";
+import RobotRightAxisY from "@assets/images/robot-right-axis-y.svg?react";
+import RobotLeftBody from "@assets/images/robot-left-body.svg?react";
+import RobotLeftAxisX from "@assets/images/robot-left-axis-x.svg?react";
+import RobotLeftAxisY from "@assets/images/robot-left-axis-y.svg?react";
 
 export interface RobotMovement {
     x: {

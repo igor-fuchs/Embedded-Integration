@@ -1,9 +1,9 @@
-import Logo from '../../assets/logo.svg';
-import ReactIcon from '../../assets/icons/react-icon.svg';
-import DotNetIcon from '../../assets/icons/dotnet-icon.png';
-import ConfigIcon from '../../assets/icons/config-icon.svg';
-import PaintIcon from '../../assets/icons/paint-icon.svg';
-import IndustrialIcon from '../../assets/icons/industrial-icon.svg';
+import Logo from '@assets/logo.svg';
+import ReactIcon from '@assets/icons/react-icon.svg';
+import DotNetIcon from '@assets/icons/dotnet-icon.png';
+import ConfigIcon from '@assets/icons/config-icon.svg';
+import PaintIcon from '@assets/icons/paint-icon.svg';
+import IndustrialIcon from '@assets/icons/industrial-icon.svg';
 
 export const listCards = [
     {
