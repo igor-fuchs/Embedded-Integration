@@ -9,7 +9,7 @@ export default function FactoryButtons() {
     const { t } = useTranslation();
 
     return (
-        <StyleFactoryButtons className="feature-cards">
+        <StyleFactoryButtons >
             <div className="feature-card">
                 <div className="feature-icon control">
                     <img src={ConnectionIcon} alt="Control Signals Icon" />
