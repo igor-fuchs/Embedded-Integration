@@ -9,8 +9,6 @@ import Part from './Part';
 import PlayButtonIcon from '@assets/icons/play-button-icon.svg';
 import FactoryBackground from '@assets/images/factory-background.svg';
 
-// Adicionar um efeito de sombra no arco da esteira para dar profundidade 
-
 const BASE_WIDTH = 1024;
 const BASE_HEIGHT = 590;
 
@@ -20,7 +18,12 @@ interface PartData {
     position: 'left' | 'right';
 }
 
-export default function PlayFactory() {
+interface PlayFactoryProps { 
+    simulationStart: boolean;
+    setSimulationStart: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export default function PlayFactory({ simulationStart, setSimulationStart }: PlayFactoryProps) {
     // #region Test States
     // Test variables after delete
     const [bigConveyorRunning, setBigConveyorRunning] = useState<boolean>(false);
@@ -71,7 +74,6 @@ export default function PlayFactory() {
 
     // #region States, Refs
     const { t } = useTranslation();
-    const [simulationStart, setSimulationStart] = useState<boolean>(false);
     const [screenHeight, setScreenHeight] = useState<number>(BASE_HEIGHT);
     const [parts, setParts] = useState<PartData[]>([]);
     const screenRef = useRef<HTMLDivElement>(null);
