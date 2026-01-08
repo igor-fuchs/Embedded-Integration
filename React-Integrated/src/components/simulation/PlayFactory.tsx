@@ -20,7 +20,7 @@ interface PartData {
     position: 'left' | 'right';
 }
 
-export function PlayFactory() {
+export default function PlayFactory() {
     // #region Test States
     // Test variables after delete
     const [bigConveyorRunning, setBigConveyorRunning] = useState<boolean>(false);
