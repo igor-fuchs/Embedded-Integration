@@ -14,10 +14,7 @@ import {
 /** Represents an OPC UA node response from the server */
 export interface OpcuaNodeResponse {
   name: string;
-  value?: unknown;
-  dataType?: string;
-  timestamp?: string;
-  [key: string]: unknown;
+  value: number | string | boolean;
 }
 
 /** Connection status states */
@@ -31,6 +28,7 @@ export type ConnectionStatus =
 /** Hub event names matching the backend IOpcuaNodeHubClient interface */
 const HubEvents = {
   SIMULATION_FRONT_NODE: 'SimulationFrontNode',
+  SIMULATION_FRONT_INITIAL_STATE: 'SimulationFrontInitialState',
 } as const;
 
 /** Hub method names for server invocation */
@@ -41,6 +39,7 @@ const HubMethods = {
 /** Event handler callbacks */
 interface OpcuaNodeHubEventHandlers {
   onSimulationFrontNode?: (node: OpcuaNodeResponse) => void;
+  onSimulationFrontInitialState?: (nodes: OpcuaNodeResponse[]) => void;
   onConnectionChange?: (status: ConnectionStatus) => void;
   onError?: (error: Error) => void;
 }
@@ -219,6 +218,10 @@ export function useOpcuaNodeHub(
     // Register hub event handlers
     connection.on(HubEvents.SIMULATION_FRONT_NODE, (node: OpcuaNodeResponse) => {
       handlersRef.current.onSimulationFrontNode?.(node);
+    });
+
+    connection.on(HubEvents.SIMULATION_FRONT_INITIAL_STATE, (nodes: OpcuaNodeResponse[]) => {
+      handlersRef.current.onSimulationFrontInitialState?.(nodes);
     });
 
     // Connection lifecycle handlers

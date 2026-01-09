@@ -16,6 +16,10 @@ export default function LiveDemo() {
         console.log('Simulation front node updated:', node);
     }, []);
 
+    const handleSimulationFrontInitialState = useCallback((nodes: OpcuaNodeResponse[]) => {
+        console.log('Simulation front initial state received:', nodes);
+    }, []);
+
     const handleConnectionChange = useCallback((status: ConnectionStatus) => {
         console.log('Connection status:', status);
     }, []);
@@ -24,6 +28,7 @@ export default function LiveDemo() {
     const { status, isConnected, error } = useOpcuaNodeHub(
         {
             onSimulationFrontNode: handleSimulationFrontNode,
+            onSimulationFrontInitialState: handleSimulationFrontInitialState,
             onConnectionChange: handleConnectionChange,
         },
         {
@@ -46,7 +51,7 @@ export default function LiveDemo() {
             });
     }, [simulationStart]);
 
-    // Debug logging (remove in production)
+    // Debug logging
     useEffect(() => {
         if (import.meta.env.DEV) {
             console.log('[LiveDemo] Hub status:', status, '| Error:', error, '| Connected:', isConnected);
