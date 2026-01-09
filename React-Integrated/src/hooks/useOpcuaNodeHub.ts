@@ -30,16 +30,17 @@ export type ConnectionStatus =
 
 /** Hub event names matching the backend IOpcuaNodeHubClient interface */
 const HubEvents = {
-  NODE_CREATED: 'NodeCreated',
-  NODE_UPDATED: 'NodeUpdated',
-  NODE_DELETED: 'NodeDeleted',
+  SIMULATION_FRONT_NODE: 'SimulationFrontNode',
+} as const;
+
+/** Hub method names for server invocation */
+const HubMethods = {
+  SUBSCRIBE_TO_SIMULATION_FRONT: 'SubscribeToSimulationFront',
 } as const;
 
 /** Event handler callbacks */
 interface OpcuaNodeHubEventHandlers {
-  onNodeCreated?: (node: OpcuaNodeResponse) => void;
-  onNodeUpdated?: (node: OpcuaNodeResponse) => void;
-  onNodeDeleted?: (nodeName: string) => void;
+  onSimulationFrontNode?: (node: OpcuaNodeResponse) => void;
   onConnectionChange?: (status: ConnectionStatus) => void;
   onError?: (error: Error) => void;
 }
@@ -103,7 +104,7 @@ const DEFAULT_CONFIG: Required<UseOpcuaNodeHubConfig> = {
  * @example
  * ```tsx
  * const { status, isConnected, connect, disconnect } = useOpcuaNodeHub({
- *   onNodeUpdated: (node) => console.log('Updated:', node),
+ *   onSimulationFrontNode: (node) => console.log('Changed:', node),
  *   onConnectionChange: (status) => console.log('Status:', status),
  * }, {
  *   enabled: isSimulationRunning,
@@ -216,16 +217,8 @@ export function useOpcuaNodeHub(
       .build();
 
     // Register hub event handlers
-    connection.on(HubEvents.NODE_CREATED, (node: OpcuaNodeResponse) => {
-      handlersRef.current.onNodeCreated?.(node);
-    });
-
-    connection.on(HubEvents.NODE_UPDATED, (node: OpcuaNodeResponse) => {
-      handlersRef.current.onNodeUpdated?.(node);
-    });
-
-    connection.on(HubEvents.NODE_DELETED, (nodeName: string) => {
-      handlersRef.current.onNodeDeleted?.(nodeName);
+    connection.on(HubEvents.SIMULATION_FRONT_NODE, (node: OpcuaNodeResponse) => {
+      handlersRef.current.onSimulationFrontNode?.(node);
     });
 
     // Connection lifecycle handlers
@@ -278,6 +271,9 @@ export function useOpcuaNodeHub(
       }
 
       await connectionRef.current.start();
+      
+      // Subscribe to simulation front group after successful connection
+      await connectionRef.current.invoke(HubMethods.SUBSCRIBE_TO_SIMULATION_FRONT);
       
       reconnectAttemptsRef.current = 0;
       updateStatus('connected');

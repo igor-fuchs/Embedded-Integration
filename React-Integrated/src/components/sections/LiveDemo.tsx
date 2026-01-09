@@ -12,16 +12,8 @@ export default function LiveDemo() {
     const [simulationStart, setSimulationStart] = useState<boolean>(false);
 
     // Memoized handlers to prevent unnecessary reconnections
-    const handleNodeCreated = useCallback((node: OpcuaNodeResponse) => {
-        console.log('Node created:', node);
-    }, []);
-
-    const handleNodeUpdated = useCallback((node: OpcuaNodeResponse) => {
-        console.log('Node updated:', node);
-    }, []);
-
-    const handleNodeDeleted = useCallback((nodeName: string) => {
-        console.log('Node deleted:', nodeName);
+    const handleSimulationFrontNode = useCallback((node: OpcuaNodeResponse) => {
+        console.log('Simulation front node updated:', node);
     }, []);
 
     const handleConnectionChange = useCallback((status: ConnectionStatus) => {
@@ -31,9 +23,7 @@ export default function LiveDemo() {
     // SignalR Hub connection
     const { status, isConnected, error } = useOpcuaNodeHub(
         {
-            onNodeCreated: handleNodeCreated,
-            onNodeUpdated: handleNodeUpdated,
-            onNodeDeleted: handleNodeDeleted,
+            onSimulationFrontNode: handleSimulationFrontNode,
             onConnectionChange: handleConnectionChange,
         },
         {
