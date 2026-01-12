@@ -32,6 +32,7 @@ export default function PlayFactory({ simulationStart, setSimulationStart, equip
     const [parts, setParts] = useState<PartData[]>([]);
     const screenRef = useRef<HTMLDivElement>(null);
     const nextPartId = useRef<number>(0);
+    const lastCreatePartsRef = useRef<boolean>(false);
 
     // Equipament auxs
     const [robotLeftMovement, setRobotLeftMovement] = useState<RobotMovement>({
@@ -112,7 +113,6 @@ export default function PlayFactory({ simulationStart, setSimulationStart, equip
     }
 
     // Trigger createTwoParts when CreateParts becomes true
-    const lastCreatePartsRef = useRef<boolean>(false);
     useEffect(() => {
         if (equipamentValue.CreateParts && !lastCreatePartsRef.current) {
             createTwoParts();
