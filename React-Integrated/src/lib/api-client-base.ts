@@ -1,3 +1,5 @@
+import { requiredEnv } from "@utils/requiredEnv";
+
 interface RequestConfig extends RequestInit {
     params?: Record<string, string | number | boolean>;
     timeout?: number;
@@ -5,7 +7,7 @@ interface RequestConfig extends RequestInit {
 
 // #region Base API Client
 export default class BaseApiClient {
-    protected baseURL: string = 'http://localhost:5000';
+    protected baseURL: string = requiredEnv('ENV_API_BASE_URL');
     protected defaultHeaders: Record<string, string> = {
         "Content-Type": "application/json"
     };
@@ -105,38 +107,37 @@ export default class BaseApiClient {
 // #endregion
 
 // #region Example Usage
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  avatar?: string;
-}
+// interface User {
+//   id: number;
+//   name: string;
+//   email: string;
+//   avatar?: string;
+// }
 
-interface CreateUserData {
-  name: string;
-  email: string;
-}
+// interface CreateUserData {
+//   name: string;
+//   email: string;
+// }
 
-//@ts-ignore#6196
-class UsersAPI extends BaseApiClient {
-  async getUsers(page = 1): Promise<User[]> {
-    return this.get<User[]>('/users', { params: { page } });
-  }
+// class UsersAPI extends BaseApiClient {
+//   async getUsers(page = 1): Promise<User[]> {
+//     return this.get<User[]>('/users', { params: { page } });
+//   }
 
-  async getUserById(id: number): Promise<User> {
-    return this.get<User>(`/users/${id}`);
-  }
+//   async getUserById(id: number): Promise<User> {
+//     return this.get<User>(`/users/${id}`);
+//   }
 
-  async createUser(data: CreateUserData): Promise<User> {
-    return this.post<User>('/users', data);
-  }
+//   async createUser(data: CreateUserData): Promise<User> {
+//     return this.post<User>('/users', data);
+//   }
 
-  async updateUser(id: number, data: Partial<User>): Promise<User> {
-    return this.put<User>(`/users/${id}`, data);
-  }
+//   async updateUser(id: number, data: Partial<User>): Promise<User> {
+//     return this.put<User>(`/users/${id}`, data);
+//   }
 
-  async deleteUser(id: number): Promise<void> {
-    return this.delete<void>(`/users/${id}`);
-  }
-}
+//   async deleteUser(id: number): Promise<void> {
+//     return this.delete<void>(`/users/${id}`);
+//   }
+// }
 // #endregion

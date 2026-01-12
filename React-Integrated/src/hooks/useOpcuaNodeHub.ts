@@ -6,6 +6,7 @@ import {
   HttpTransportType,
   LogLevel,
 } from '@microsoft/signalr';
+import { requiredEnv } from '@utils/requiredEnv';
 
 // ============================================================================
 // Types & Interfaces
@@ -81,7 +82,7 @@ interface UseOpcuaNodeHubReturn {
 // ============================================================================
 
 const DEFAULT_CONFIG: Required<UseOpcuaNodeHubConfig> = {
-  hubUrl: 'http://localhost:5000/hubs/opcua-nodes',
+  hubUrl: requiredEnv('ENV_OPCUA_HUB_URL'),
   autoReconnect: true,
   reconnectDelayMs: 5000,
   maxReconnectAttempts: 10,
