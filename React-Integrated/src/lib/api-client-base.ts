@@ -7,9 +7,9 @@ interface RequestConfig extends RequestInit {
 
 // #region Base API Client
 export default class BaseApiClient {
-    protected baseURL: string = requiredEnv('ENV_API_BASE_URL');
+    protected baseURL: string = requiredEnv("VITE_API_BASE_URL");
     protected defaultHeaders: Record<string, string> = {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
     };
 
     constructor() {
@@ -18,7 +18,10 @@ export default class BaseApiClient {
     }
 
     private buildURL(endpoint: string, params?: Record<string, any>): string {
-        const url = new URL(endpoint, this.baseURL);
+        const normalizedBaseURL = this.baseURL.replace(/\/+$/, "");
+        const normalizedEndpoint = endpoint.replace(/^\/+/, "");
+
+        const url = new URL(`${normalizedBaseURL}/${normalizedEndpoint}`);
         if (params) {
             Object.entries(params).forEach(([key, value]) => {
                 url.searchParams.append(key, String(value));

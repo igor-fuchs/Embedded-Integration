@@ -3,25 +3,48 @@ import { useTranslation } from "react-i18next";
 import PlayFactory from "@simulation/PlayFactory";
 import FactoryButtons from "@simulation/FactoryButtons";
 import { useCallback, useEffect, useState } from "react";
-import { OpcuaNodesApi } from "@lib/api-client";
-import { useOpcuaNodeHub, type ConnectionStatus, type OpcuaNodeResponse } from "@hooks/useOpcuaNodeHub";
+import { useOpcuaNodeHub, type ConnectionStatus } from "@hooks/useOpcuaNodeHub";
+import { DEFAULT_EQUIPMENT_STATE, type EquipamentSubscriptionResponse, type OpcuaNodeResponse } from "@interfaces/OpcuaHubInterfaces";
 
 export default function LiveDemo() {
     const { t } = useTranslation();
 
     const [simulationStart, setSimulationStart] = useState<boolean>(false);
+    const [equipmentValue, setEquipmentValue] = useState<EquipamentSubscriptionResponse>(DEFAULT_EQUIPMENT_STATE);
 
     // Memoized handlers to prevent unnecessary reconnections
     const handleSimulationFrontNode = useCallback((node: OpcuaNodeResponse) => {
-        console.log('Simulation front node updated:', node);
+        console.log('Simulation front node received:', node.name, node.value);
+
+        setEquipmentValue(prev => {
+            // Ensure the node name exists in the equipment state
+            if (node.name in prev) {
+                return {
+                    ...prev,
+                    [node.name]: node.value.toString().toLowerCase() == 'true'
+                };
+            }
+            return prev;
+        });
     }, []);
 
     const handleSimulationFrontInitialState = useCallback((nodes: OpcuaNodeResponse[]) => {
-        console.log('Simulation front initial state received:', nodes);
+        //console.log('Simulation front initial state received:', nodes);
+        
+        setEquipmentValue(prev => {
+            const newState = { ...prev };
+            nodes.forEach(node => {
+                // Ensure the node name exists in the equipment state
+                if (node.name in newState) {
+                    newState[node.name as keyof EquipamentSubscriptionResponse] = node.value?.toString().toLowerCase() == 'true';
+                }
+            });
+            return newState;
+        });
     }, []);
 
     const handleConnectionChange = useCallback((status: ConnectionStatus) => {
-        console.log('Connection status:', status);
+        console.debug('Connection status:', status); // Criar loading
     }, []);
 
     // SignalR Hub connection
@@ -36,20 +59,6 @@ export default function LiveDemo() {
             autoReconnect: true,
         }
     );
-
-    // Fetch initial nodes when simulation starts
-    useEffect(() => {
-        if (!simulationStart) return;
-
-        const api = new OpcuaNodesApi();
-        api.getNodes()
-            .then((response) => {
-                console.log('OPC UA Nodes:', response);
-            })
-            .catch((err) => {
-                console.error('Failed to fetch nodes:', err);
-            });
-    }, [simulationStart]);
 
     // Debug logging
     useEffect(() => {
@@ -74,6 +83,7 @@ export default function LiveDemo() {
                         <PlayFactory
                             simulationStart={simulationStart}
                             setSimulationStart={setSimulationStart}
+                            equipamentValue={equipmentValue}
                         />
                         <FactoryButtons />
                     </div>

@@ -7,16 +7,13 @@ import {
   LogLevel,
 } from '@microsoft/signalr';
 import { requiredEnv } from '@utils/requiredEnv';
+import type { OpcuaNodeResponse } from '@interfaces/OpcuaHubInterfaces';
 
 // ============================================================================
 // Types & Interfaces
 // ============================================================================
 
-/** Represents an OPC UA node response from the server */
-export interface OpcuaNodeResponse {
-  name: string;
-  value: number | string | boolean;
-}
+
 
 /** Connection status states */
 export type ConnectionStatus = 
@@ -82,7 +79,7 @@ interface UseOpcuaNodeHubReturn {
 // ============================================================================
 
 const DEFAULT_CONFIG: Required<UseOpcuaNodeHubConfig> = {
-  hubUrl: requiredEnv('ENV_OPCUA_HUB_URL'),
+  hubUrl: requiredEnv('VITE_OPCUA_HUB_URL'),
   autoReconnect: true,
   reconnectDelayMs: 5000,
   maxReconnectAttempts: 10,

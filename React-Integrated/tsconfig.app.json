@@ -37,7 +37,8 @@
       "@sections/*": ["src/components/sections/*"],
       "@simulation/*": ["src/components/simulation/*"],
       "@styles/*": ["src/styles/*"],
-      "@utils/*": ["src/utils/*"]
+      "@utils/*": ["src/utils/*"],
+      "@interfaces/*": ["src/interfaces/*"]
     }
   },
   "include": ["src"]
