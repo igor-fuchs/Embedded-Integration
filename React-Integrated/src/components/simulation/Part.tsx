@@ -169,7 +169,7 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
 
             // Extract and combine transitions (use the one that's not default)
             const xTransitionMs = robot.movement.x.transitionMs;
-            const yTransitionMs = robot.movement.y.transitionMs; // Check if in the future we need to combine both
+            //const yTransitionMs = robot.movement.y.transitionMs; // Check if in the future we need to combine both
 
             // Apply transition (prefer the x transition)
             const transition = `transform ${xTransitionMs}ms ease`;

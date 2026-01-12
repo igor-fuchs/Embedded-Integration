@@ -2,7 +2,6 @@ import Logo from '@assets/logo.svg';
 import ReactIcon from '@assets/icons/react-icon.svg';
 import DotNetIcon from '@assets/icons/dotnet-icon.png';
 import ConfigIcon from '@assets/icons/config-icon.svg';
-import PaintIcon from '@assets/icons/paint-icon.svg';
 import IndustrialIcon from '@assets/icons/industrial-icon.svg';
 
 export const listCards = [
@@ -46,12 +45,4 @@ export const listCards = [
         description:
             "OPC UA and HTTP enabling communication between industrial devices and web services.",
     },
-    // {
-    //     key: "pixel-art",
-    //     iconClass: "pixel-art",
-    //     icon: PaintIcon,
-    //     title: "Pixel Art",
-    //     description:
-    //         "Custom animated pixel art visualizations bringing factory operations to life in a unique artistic style.",
-    // },
 ];
