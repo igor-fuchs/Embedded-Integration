@@ -8,7 +8,8 @@ export const DEFAULT_EQUIPMENT_STATE: EquipamentSubscriptionResponse = {
     ActuatorCinRetract: false,
     ConveyorLeftRunning: false,
     ConveyorRightRunning: false,
-    BigConveyorRunning: false,
+    BigConveyorFirstRunning: false,
+    BigConveyorSecondRunning: false,
     RobotLeftToHome: false,
     RobotLeftMovingToDrop: false,
     RobotLeftToPick: false,
@@ -32,7 +33,8 @@ export interface EquipamentSubscriptionResponse {
     ActuatorCinRetract: boolean;
     ConveyorLeftRunning: boolean;
     ConveyorRightRunning: boolean;
-    BigConveyorRunning: boolean;
+    BigConveyorFirstRunning: boolean; // changed
+    BigConveyorSecondRunning: boolean; // changed
     RobotLeftToHome: boolean;
     RobotLeftMovingToDrop: boolean;
     RobotLeftToPick: boolean;

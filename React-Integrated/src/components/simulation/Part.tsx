@@ -17,8 +17,10 @@ interface PartProps {
         movement: RobotMovement;
     };
     bigConveyor: {
-        ref: React.RefObject<HTMLDivElement | null>;
-        running: boolean;
+        firstRef: React.RefObject<HTMLDivElement | null>;
+        secondRef: React.RefObject<HTMLDivElement | null>;
+        firstRunning: boolean;
+        secondRunning: boolean;
     }
     actuatorA: {
         ref: React.RefObject<HTMLDivElement | null>;
@@ -51,8 +53,6 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
     const conveyorFrameTime = useRef<number>(0);
 
     //Big conveyor dependencies
-    const bigConveyorAnimationID = useRef<number | null>(null);
-    const bigConveyorFrameTime = useRef<number>(0);
     const [rampAnimation, setRampAnimation] = useState<number>(0);
 
     // Robot dependencies
@@ -78,7 +78,7 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
                     2: "ramp-c",
                 };
 
-                const parentElement = bigConveyor.ref.current!.parentElement!;
+                const parentElement = bigConveyor.secondRef.current!.parentElement!;
                 const targetRamp = parentElement.querySelector(`[data-id="${rampIdMap[index]}"]`) as HTMLElement;
                 const rampRect = targetRamp!.getBoundingClientRect();
 
@@ -185,16 +185,30 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
     useEffect(() => {
         if (isFinished) return;
         followConveyorAnimation({
-            conveyorRef: bigConveyor.ref,
-            frameTime: bigConveyorFrameTime,
-            animationID: bigConveyorAnimationID,
-            running: bigConveyor.running,
-            touching: isTouching(partRef, bigConveyor.ref),
+            conveyorRef: bigConveyor.firstRef,
+            frameTime: conveyorFrameTime,
+            animationID: conveyorAnimationID,
+            running: bigConveyor.firstRunning,
+            touching: isTouching(partRef, bigConveyor.firstRef),
             scaleFactor,
             setOffset
         });
 
-    }, [bigConveyor.running]);
+    }, [bigConveyor.firstRunning]);
+
+    useEffect(() => {
+        if (isFinished) return;
+        followConveyorAnimation({
+            conveyorRef: bigConveyor.secondRef,
+            frameTime: conveyorFrameTime,
+            animationID: conveyorAnimationID,
+            running: bigConveyor.secondRunning,
+            touching: isTouching(partRef, bigConveyor.secondRef),
+            scaleFactor,
+            setOffset
+        });
+
+    }, [bigConveyor.secondRunning]);
     // #endregion
 
     // #region Actuators
@@ -241,9 +255,9 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
     useEffect(() => {
         if (isFinished) return;
         if (rampAnimation === 0) return;
-        if (!partRef.current || !bigConveyor.ref.current) return;
+        if (!partRef.current || !bigConveyor.secondRef.current) return;
 
-        const parentElement = bigConveyor.ref.current.parentElement;
+        const parentElement = bigConveyor.secondRef.current.parentElement;
         if (!parentElement) return;
 
         const rampIdMap: Record<number, string> = {

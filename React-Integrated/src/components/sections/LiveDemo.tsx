@@ -10,7 +10,7 @@ export default function LiveDemo() {
     const { t } = useTranslation();
 
     const [simulationStart, setSimulationStart] = useState<boolean>(false);
-    const [equipmentValue, setEquipmentValue] = useState<EquipamentSubscriptionResponse>(DEFAULT_EQUIPMENT_STATE);
+    const [equipmentsValue, setEquipmentValue] = useState<EquipamentSubscriptionResponse>(DEFAULT_EQUIPMENT_STATE);
 
     // Memoized handlers to prevent unnecessary reconnections
     const handleSimulationFrontNode = useCallback((node: OpcuaNodeResponse) => {
@@ -79,11 +79,18 @@ export default function LiveDemo() {
                     </div>
 
                     {/* Simulation Card */}
-                    <div className="demo-card">
+                    <div className="demo-card" onClick={() => {
+                        setEquipmentValue((prev) =>{
+                            return {
+                                ...prev,
+                                BigConveyorFirstRunning: !prev.BigConveyorFirstRunning,
+                            }
+                        })
+                    }}>
                         <PlayFactory
                             simulationStart={simulationStart}
                             setSimulationStart={setSimulationStart}
-                            equipamentValue={equipmentValue}
+                            equipmentsValue={equipmentsValue}
                         />
                         <FactoryButtons />
                     </div>

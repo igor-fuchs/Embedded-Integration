@@ -2,7 +2,10 @@ import styled from "styled-components";
 
 interface BigConveyorProps {
     $animationDurationMs: number;
-    $running: boolean;
+    $firstRunning: boolean;
+    $secondRunning: boolean;
+    $firstHeight: number;
+    $secondHeight: number;
 }
 
 export const StyleBigConveyor = styled.div<BigConveyorProps>`
@@ -19,14 +22,34 @@ export const StyleBigConveyor = styled.div<BigConveyorProps>`
         height: 100%;
     }
 
+    .first-belt-container,
+    .second-belt-container {
+        overflow: hidden;
+    }
+
     .belt {
         position: absolute;
+        bottom: 0;
+        left: 0;
         display: flex;
         flex-direction: column;
-        animation: conveyorMove ${(props) => props.$animationDurationMs}ms
-            linear infinite;
-        animation-play-state: ${(props) =>
-            props.$running ? "running" : "paused"};
+
+        &.first {
+            animation: conveyorMove ${(props) => props.$animationDurationMs}ms
+                linear infinite;
+            animation-play-state: ${(props) =>
+                props.$firstRunning ? "running" : "paused"};
+        }
+
+        &.second {
+            animation: conveyorMove
+                ${(props) =>
+                    (props.$secondHeight / props.$firstHeight) *
+                    props.$animationDurationMs}ms
+                linear infinite; // condition to move copied from .tsx file (BigConveyor.tsx)
+            animation-play-state: ${(props) =>
+                props.$secondRunning ? "running" : "paused"};
+        }
     }
 
     @keyframes conveyorMove {

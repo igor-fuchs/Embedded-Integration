@@ -19,13 +19,13 @@ interface PartData {
     position: 'left' | 'right';
 }
 
-interface PlayFactoryProps { 
+interface PlayFactoryProps {
     simulationStart: boolean;
     setSimulationStart: React.Dispatch<React.SetStateAction<boolean>>;
-    equipamentValue: EquipamentSubscriptionResponse;
+    equipmentsValue: EquipamentSubscriptionResponse;
 }
 
-export default function PlayFactory({ simulationStart, setSimulationStart, equipamentValue }: PlayFactoryProps) {
+export default function PlayFactory({ simulationStart, setSimulationStart, equipmentsValue }: PlayFactoryProps) {
     // #region States, Refs
     const { t } = useTranslation();
     const [screenHeight, setScreenHeight] = useState<number>(BASE_HEIGHT);
@@ -59,7 +59,8 @@ export default function PlayFactory({ simulationStart, setSimulationStart, equip
     const conveyorRightRef = useRef<HTMLDivElement>(null);
     const robotLeftRef = useRef<HTMLDivElement>(null);
     const robotRightRef = useRef<HTMLDivElement>(null);
-    const bigConveyorRef = useRef<HTMLDivElement>(null);
+    const bigConveyorFirstRef = useRef<HTMLDivElement>(null);
+    const bigConveyorSecondRef = useRef<HTMLDivElement>(null);
     const actuatorCRef = useRef<HTMLDivElement>(null);
     const actuatorBRef = useRef<HTMLDivElement>(null);
     const actuatorARef = useRef<HTMLDivElement>(null);
@@ -114,11 +115,11 @@ export default function PlayFactory({ simulationStart, setSimulationStart, equip
 
     // Trigger createTwoParts when CreateParts becomes true
     useEffect(() => {
-        if (equipamentValue.CreateParts && !lastCreatePartsRef.current) {
+        if (equipmentsValue.CreateParts && !lastCreatePartsRef.current) {
             createTwoParts();
         }
-        lastCreatePartsRef.current = equipamentValue.CreateParts;
-    }, [equipamentValue.CreateParts, createTwoParts]);
+
+    }, [equipmentsValue.CreateParts, createTwoParts]);
 
     // Refresh dimensions on window resize
     useEffect(() => {
@@ -186,7 +187,7 @@ export default function PlayFactory({ simulationStart, setSimulationStart, equip
                                         bodyIndex={89}
                                         bodyStyle={equipamentStyle({ width: 68, height: 253, left: 404, bottom: 19 })}
                                         beltStyle={equipamentStyle({ width: 68, bottom: 31, left: 0 })}
-                                        running={equipamentValue.ConveyorLeftRunning}
+                                        running={equipmentsValue.ConveyorLeftRunning}
                                         scaleFactor={getScaleCoefficient()}
                                     />
                                     <Robot
@@ -194,10 +195,10 @@ export default function PlayFactory({ simulationStart, setSimulationStart, equip
                                         ref={robotLeftRef}
                                         bodyIndex={99}
                                         bodyStyle={equipamentStyle({ width: 153, height: 125, left: 296, bottom: 209 })}
-                                        moveToHome={equipamentValue.RobotLeftToHome}
-                                        moveToPick={equipamentValue.RobotLeftToPick}
-                                        moveToAntecipation={equipamentValue.RobotLeftToAntecipation}
-                                        moveToDrop={equipamentValue.RobotLeftMovingToDrop}
+                                        moveToHome={equipmentsValue.RobotLeftToHome}
+                                        moveToPick={equipmentsValue.RobotLeftToPick}
+                                        moveToAntecipation={equipmentsValue.RobotLeftToAntecipation}
+                                        moveToDrop={equipmentsValue.RobotLeftMovingToDrop}
                                         setRobotMovement={setRobotLeftMovement}
                                         robotMovement={robotLeftMovement}
                                         scaleFactor={getScaleCoefficient()}
@@ -211,7 +212,7 @@ export default function PlayFactory({ simulationStart, setSimulationStart, equip
                                         bodyIndex={89}
                                         bodyStyle={equipamentStyle({ width: 68, height: 253, right: 388, bottom: 19 })}
                                         beltStyle={equipamentStyle({ width: 68, bottom: 31, right: 0 })}
-                                        running={equipamentValue.ConveyorRightRunning}
+                                        running={equipmentsValue.ConveyorRightRunning}
                                         scaleFactor={getScaleCoefficient()}
                                     />
                                     <Robot
@@ -219,10 +220,10 @@ export default function PlayFactory({ simulationStart, setSimulationStart, equip
                                         ref={robotRightRef}
                                         bodyIndex={99}
                                         bodyStyle={equipamentStyle({ width: 153, height: 125, right: 275, bottom: 209 })}
-                                        moveToHome={equipamentValue.RobotRightToHome}
-                                        moveToPick={equipamentValue.RobotRightToPick}
-                                        moveToAntecipation={equipamentValue.RobotRightToAntecipation}
-                                        moveToDrop={equipamentValue.RobotRightMovingToDrop}
+                                        moveToHome={equipmentsValue.RobotRightToHome}
+                                        moveToPick={equipmentsValue.RobotRightToPick}
+                                        moveToAntecipation={equipmentsValue.RobotRightToAntecipation}
+                                        moveToDrop={equipmentsValue.RobotRightMovingToDrop}
                                         setRobotMovement={setRobotRightMovement}
                                         robotMovement={robotRightMovement}
                                         scaleFactor={getScaleCoefficient()}
@@ -232,11 +233,14 @@ export default function PlayFactory({ simulationStart, setSimulationStart, equip
                                 <section className='center'>
                                     <BigConveyor
                                         id={"big-conveyor"}
-                                        ref={bigConveyorRef}
+                                        firstRef={bigConveyorFirstRef}
+                                        secondRef={bigConveyorSecondRef}
                                         bodyIndex={89}
                                         bodyStyle={equipamentStyle({ width: 186, height: 369, top: 36, right: 354 })}
-                                        beltStyle={equipamentStyle({ width: 56, bottom: 31, left: 0 })}
-                                        running={equipamentValue.BigConveyorRunning}
+                                        firstBeltStyle={equipamentStyle({ width: 56, height: 97, bottom: 31, left: 0 })}
+                                        secondBeltStyle={equipamentStyle({ width: 56, height: 243, bottom: 97 + 31, left: 0 })} // bottom = firstBeltStyle.height + firstBeltStyle.bottom
+                                        firstRunning={equipmentsValue.BigConveyorFirstRunning}
+                                        secondRunning={equipmentsValue.BigConveyorSecondRunning}
                                         scaleFactor={getScaleCoefficient()}
                                     />
                                     <Actuator
@@ -245,8 +249,8 @@ export default function PlayFactory({ simulationStart, setSimulationStart, equip
                                         bodyIndex={99}
                                         bodyStyle={equipamentStyle({ width: 144, height: 44, top: 63, left: 412 })}
                                         axisStyle={equipamentStyle({ width: 144, height: 44, top: 0, left: -56 })}
-                                        advance={equipamentValue.ActuatorCinAdvance}
-                                        retract={equipamentValue.ActuatorCinRetract}
+                                        advance={equipmentsValue.ActuatorCinAdvance}
+                                        retract={equipmentsValue.ActuatorCinRetract}
                                         scaleFactor={getScaleCoefficient()}
                                     />
                                     <Actuator
@@ -255,8 +259,8 @@ export default function PlayFactory({ simulationStart, setSimulationStart, equip
                                         bodyIndex={99}
                                         bodyStyle={equipamentStyle({ width: 144, height: 44, top: 135, left: 412 })}
                                         axisStyle={equipamentStyle({ width: 144, height: 44, top: 0, left: -56 })}
-                                        advance={equipamentValue.ActuatorBinAdvance}
-                                        retract={equipamentValue.ActuatorBinRetract}
+                                        advance={equipmentsValue.ActuatorBinAdvance}
+                                        retract={equipmentsValue.ActuatorBinRetract}
                                         scaleFactor={getScaleCoefficient()}
                                     />
                                     <Actuator
@@ -265,8 +269,8 @@ export default function PlayFactory({ simulationStart, setSimulationStart, equip
                                         bodyIndex={99}
                                         bodyStyle={equipamentStyle({ width: 144, height: 44, top: 206, left: 412 })}
                                         axisStyle={equipamentStyle({ width: 144, height: 44, bottom: 0, left: -56 })}
-                                        advance={equipamentValue.ActuatorAinAdvance}
-                                        retract={equipamentValue.ActuatorAinRetract}
+                                        advance={equipmentsValue.ActuatorAinAdvance}
+                                        retract={equipmentsValue.ActuatorAinRetract}
                                         scaleFactor={getScaleCoefficient()}
                                     />
                                 </section>
@@ -279,33 +283,35 @@ export default function PlayFactory({ simulationStart, setSimulationStart, equip
                                             bodyStyle={equipamentStyle({
                                                 width: 20,
                                                 height: 20,
-                                                ...(part.position === 'left' ? { left: 430 } : { right: 410 }),
-                                                bottom: 36
+                                                ...(part.position === 'left' ? { left: 510 } : { right: 410 }), // 430
+                                                bottom: 206 // remover
                                             })}
                                             conveyor={{
                                                 ref: part.position === 'left' ? conveyorLeftRef : conveyorRightRef,
-                                                running: part.position === 'left' ? equipamentValue.ConveyorLeftRunning : equipamentValue.ConveyorRightRunning,
+                                                running: part.position === 'left' ? equipmentsValue.ConveyorLeftRunning : equipmentsValue.ConveyorRightRunning,
                                             }}
                                             robot={{
                                                 ref: part.position === 'left' ? robotLeftRef : robotRightRef,
-                                                isGrabbed: part.position === 'left' ? equipamentValue.RobotLeftIsGrabbed : equipamentValue.RobotRightIsGrabbed,
+                                                isGrabbed: part.position === 'left' ? equipmentsValue.RobotLeftIsGrabbed : equipmentsValue.RobotRightIsGrabbed,
                                                 movement: part.position === 'left' ? robotLeftMovement : robotRightMovement,
                                             }}
                                             bigConveyor={{
-                                                ref: bigConveyorRef,
-                                                running: equipamentValue.BigConveyorRunning,
+                                                firstRef: bigConveyorFirstRef,
+                                                secondRef: bigConveyorSecondRef,
+                                                firstRunning: equipmentsValue.BigConveyorFirstRunning,
+                                                secondRunning: equipmentsValue.BigConveyorSecondRunning,
                                             }}
                                             actuatorA={{
                                                 ref: actuatorARef,
-                                                movement: { advance: equipamentValue.ActuatorAinAdvance, retract: equipamentValue.ActuatorAinRetract }
+                                                movement: { advance: equipmentsValue.ActuatorAinAdvance, retract: equipmentsValue.ActuatorAinRetract }
                                             }}
                                             actuatorB={{
                                                 ref: actuatorBRef,
-                                                movement: { advance: equipamentValue.ActuatorBinAdvance, retract: equipamentValue.ActuatorBinRetract }
+                                                movement: { advance: equipmentsValue.ActuatorBinAdvance, retract: equipmentsValue.ActuatorBinRetract }
                                             }}
                                             actuatorC={{
                                                 ref: actuatorCRef,
-                                                movement: { advance: equipamentValue.ActuatorCinAdvance, retract: equipamentValue.ActuatorCinRetract }
+                                                movement: { advance: equipmentsValue.ActuatorCinAdvance, retract: equipmentsValue.ActuatorCinRetract }
                                             }}
                                             scaleFactor={getScaleCoefficient()}
                                         />
