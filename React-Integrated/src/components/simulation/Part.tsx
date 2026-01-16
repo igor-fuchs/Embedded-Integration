@@ -54,6 +54,12 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
 
     //Big conveyor dependencies
     const [rampAnimation, setRampAnimation] = useState<number>(0);
+    const bigConveyorFirstAnimationID = useRef<number | null>(null);
+    const bigConveyorFirstFrameTime = useRef<number>(0);
+    const bigConveyorFirstMonitorID = useRef<number | null>(null);
+    const bigConveyorSecondAnimationID = useRef<number | null>(null);
+    const bigConveyorSecondFrameTime = useRef<number>(0);
+    const bigConveyorSecondMonitorID = useRef<number | null>(null);
 
     // Robot dependencies
     const previousRobotPosition = useRef({ x: null, y: null } as { x: number | null; y: number | null }); // Track previous robot position for incremental movement
@@ -181,34 +187,144 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
     }, [robot.isGrabbed, robot.movement]);
     // #endregion
 
-    // #region Big Conveyor
+    // #region Big Conveyor - Continuous Monitoring
+    
+
+    // Continuous monitoring for first big conveyor
     useEffect(() => {
         if (isFinished) return;
-        followConveyorAnimation({
-            conveyorRef: bigConveyor.firstRef,
-            frameTime: conveyorFrameTime,
-            animationID: conveyorAnimationID,
-            running: bigConveyor.firstRunning,
-            touching: isTouching(partRef, bigConveyor.firstRef),
-            scaleFactor,
-            setOffset
-        });
 
-    }, [bigConveyor.firstRunning]);
+        let isActive = true;
 
+        const monitorFirstConveyor = () => {
+            if (!isActive) return;
+
+            const touching = isTouching(partRef, bigConveyor.firstRef);
+
+            if (bigConveyor.firstRunning && touching) {
+                // Start animation if not already running
+                if (!bigConveyorFirstAnimationID.current) {
+                    const animate = (currentTime: number) => {
+                        if (!isActive) return;
+
+                        if (!bigConveyorFirstFrameTime.current) {
+                            bigConveyorFirstFrameTime.current = currentTime;
+                        }
+
+                        const deltaTime = currentTime - bigConveyorFirstFrameTime.current;
+
+                        if (deltaTime > 0) {
+                            const speed = parseFloat(
+                                bigConveyor.firstRef.current?.dataset.speedMs || "0"
+                            );
+                            setOffset((prev) => ({
+                                ...prev,
+                                y: prev.y - (speed * deltaTime) / scaleFactor,
+                            }));
+                            bigConveyorFirstFrameTime.current = currentTime;
+                        }
+
+                        bigConveyorFirstAnimationID.current = requestAnimationFrame(animate);
+                    };
+
+                    bigConveyorFirstFrameTime.current = 0;
+                    bigConveyorFirstAnimationID.current = requestAnimationFrame(animate);
+                }
+            } else {
+                // Stop animation if running
+                if (bigConveyorFirstAnimationID.current) {
+                    cancelAnimationFrame(bigConveyorFirstAnimationID.current);
+                    bigConveyorFirstAnimationID.current = null;
+                    bigConveyorFirstFrameTime.current = 0;
+                }
+            }
+
+            // Continue monitoring
+            bigConveyorFirstMonitorID.current = requestAnimationFrame(monitorFirstConveyor);
+        };
+
+        bigConveyorFirstMonitorID.current = requestAnimationFrame(monitorFirstConveyor);
+
+        return () => {
+            isActive = false;
+            if (bigConveyorFirstMonitorID.current) {
+                cancelAnimationFrame(bigConveyorFirstMonitorID.current);
+                bigConveyorFirstMonitorID.current = null;
+            }
+            if (bigConveyorFirstAnimationID.current) {
+                cancelAnimationFrame(bigConveyorFirstAnimationID.current);
+                bigConveyorFirstAnimationID.current = null;
+            }
+        };
+    }, [bigConveyor.firstRunning, bigConveyor.firstRef, scaleFactor, isFinished]);
+
+    // Continuous monitoring for second big conveyor
     useEffect(() => {
         if (isFinished) return;
-        followConveyorAnimation({
-            conveyorRef: bigConveyor.secondRef,
-            frameTime: conveyorFrameTime,
-            animationID: conveyorAnimationID,
-            running: bigConveyor.secondRunning,
-            touching: isTouching(partRef, bigConveyor.secondRef),
-            scaleFactor,
-            setOffset
-        });
 
-    }, [bigConveyor.secondRunning]);
+        let isActive = true;
+
+        const monitorSecondConveyor = () => {
+            if (!isActive) return;
+
+            const touching = isTouching(partRef, bigConveyor.secondRef);
+
+            if (bigConveyor.secondRunning && touching) {
+                // Start animation if not already running
+                if (!bigConveyorSecondAnimationID.current) {
+                    const animate = (currentTime: number) => {
+                        if (!isActive) return;
+
+                        if (!bigConveyorSecondFrameTime.current) {
+                            bigConveyorSecondFrameTime.current = currentTime;
+                        }
+
+                        const deltaTime = currentTime - bigConveyorSecondFrameTime.current;
+
+                        if (deltaTime > 0) {
+                            const speed = parseFloat(
+                                bigConveyor.secondRef.current?.dataset.speedMs || "0"
+                            );
+                            setOffset((prev) => ({
+                                ...prev,
+                                y: prev.y - (speed * deltaTime) / scaleFactor,
+                            }));
+                            bigConveyorSecondFrameTime.current = currentTime;
+                        }
+
+                        bigConveyorSecondAnimationID.current = requestAnimationFrame(animate);
+                    };
+
+                    bigConveyorSecondFrameTime.current = 0;
+                    bigConveyorSecondAnimationID.current = requestAnimationFrame(animate);
+                }
+            } else {
+                // Stop animation if running
+                if (bigConveyorSecondAnimationID.current) {
+                    cancelAnimationFrame(bigConveyorSecondAnimationID.current);
+                    bigConveyorSecondAnimationID.current = null;
+                    bigConveyorSecondFrameTime.current = 0;
+                }
+            }
+
+            // Continue monitoring
+            bigConveyorSecondMonitorID.current = requestAnimationFrame(monitorSecondConveyor);
+        };
+
+        bigConveyorSecondMonitorID.current = requestAnimationFrame(monitorSecondConveyor);
+
+        return () => {
+            isActive = false;
+            if (bigConveyorSecondMonitorID.current) {
+                cancelAnimationFrame(bigConveyorSecondMonitorID.current);
+                bigConveyorSecondMonitorID.current = null;
+            }
+            if (bigConveyorSecondAnimationID.current) {
+                cancelAnimationFrame(bigConveyorSecondAnimationID.current);
+                bigConveyorSecondAnimationID.current = null;
+            }
+        };
+    }, [bigConveyor.secondRunning, bigConveyor.secondRef, scaleFactor, isFinished]);
     // #endregion
 
     // #region Actuators

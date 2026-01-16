@@ -283,8 +283,8 @@ export default function PlayFactory({ simulationStart, setSimulationStart, equip
                                             bodyStyle={equipamentStyle({
                                                 width: 20,
                                                 height: 20,
-                                                ...(part.position === 'left' ? { left: 510 } : { right: 410 }), // 430
-                                                bottom: 206 // remover
+                                                ...(part.position === 'left' ? { left: 430 } : { right: 410 }), // left: 510
+                                                bottom: 36 // 206
                                             })}
                                             conveyor={{
                                                 ref: part.position === 'left' ? conveyorLeftRef : conveyorRightRef,

@@ -33,8 +33,8 @@ export interface EquipamentSubscriptionResponse {
     ActuatorCinRetract: boolean;
     ConveyorLeftRunning: boolean;
     ConveyorRightRunning: boolean;
-    BigConveyorFirstRunning: boolean; // changed
-    BigConveyorSecondRunning: boolean; // changed
+    BigConveyorFirstRunning: boolean; 
+    BigConveyorSecondRunning: boolean; 
     RobotLeftToHome: boolean;
     RobotLeftMovingToDrop: boolean;
     RobotLeftToPick: boolean;

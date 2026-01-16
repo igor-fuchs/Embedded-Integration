@@ -28,9 +28,8 @@ export default function LiveDemo() {
         });
     }, []);
 
+    // Handle initial state update
     const handleSimulationFrontInitialState = useCallback((nodes: OpcuaNodeResponse[]) => {
-        //console.log('Simulation front initial state received:', nodes);
-        
         setEquipmentValue(prev => {
             const newState = { ...prev };
             nodes.forEach(node => {
@@ -43,6 +42,7 @@ export default function LiveDemo() {
         });
     }, []);
 
+    // Handle connection status changes
     const handleConnectionChange = useCallback((status: ConnectionStatus) => {
         console.debug('Connection status:', status); // Criar loading
     }, []);
@@ -79,14 +79,7 @@ export default function LiveDemo() {
                     </div>
 
                     {/* Simulation Card */}
-                    <div className="demo-card" onClick={() => {
-                        setEquipmentValue((prev) =>{
-                            return {
-                                ...prev,
-                                BigConveyorFirstRunning: !prev.BigConveyorFirstRunning,
-                            }
-                        })
-                    }}>
+                    <div className="demo-card" >
                         <PlayFactory
                             simulationStart={simulationStart}
                             setSimulationStart={setSimulationStart}
