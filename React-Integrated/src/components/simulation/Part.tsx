@@ -1,11 +1,21 @@
 import { useCallback, useEffect, useState, useRef } from 'react';
 import { StylePart } from '@styles/Part';
 import { isTouching, isCompletelyInside } from '../../lib/PartLib';
+import BluePart from '@assets/images/blue-part.svg?react';
 import GreenPart from '@assets/images/green-part.svg?react';
+import MetalPart from '@assets/images/metal-part.svg?react';
 import type { RobotMovement } from './Robot';
+
+// Mapping of SVG components based on color
+const PART_COMPONENTES = {
+    green: GreenPart,
+    blue: BluePart,
+    metal: MetalPart,
+} as const;
 
 interface PartProps {
     bodyIndex: number;
+    svgColor: 'metal' | 'green' | 'blue';
     bodyStyle: React.CSSProperties;
     conveyor: {
         ref: React.RefObject<HTMLDivElement | null>;
@@ -38,13 +48,14 @@ interface PartProps {
     scaleFactor: number;
 }
 
-export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyor, actuatorA, actuatorB, actuatorC, scaleFactor }: PartProps) {
+export default function Part({ bodyIndex, svgColor, bodyStyle, conveyor, robot, bigConveyor, actuatorA, actuatorB, actuatorC, scaleFactor }: PartProps) {
     // #region Refs, States, Callbacks
     const partRef = useRef<HTMLDivElement>(null);
     const [offset, setOffset] = useState({
         x: 0,
         y: 0,
     });
+    const PartComponent = PART_COMPONENTES[svgColor];
 
     // Frozen flag
     const [isFinished, setIsFinished] = useState<boolean>(false);
@@ -276,7 +287,7 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
     // #endregion
 
     // #region Big Conveyor 
-    
+
     // Continuous monitoring for first big conveyor
     useEffect(() => {
         if (isFinished || (robot.isGrabbed && isTouching(partRef, robot.ref))) return;
@@ -522,7 +533,7 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
             $xOffset={offset.x * scaleFactor}
             $yOffset={offset.y * scaleFactor}
         >
-            <GreenPart className='part' />
+            <PartComponent className='part' />
         </StylePart>
     );
     // #endregion

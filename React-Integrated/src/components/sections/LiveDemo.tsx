@@ -27,10 +27,10 @@ export default function LiveDemo() {
             return prev;
         });
 
-        if(node.name == "ConveyorLeftRunning" || node.name == "ConveyorRightRunning") {
-            var data = new Date();
-            console.log(`[${data.getHours()}:${data.getMinutes()}:${data.getSeconds()}] ${node.name} = ${node.value}`);
-        }
+        // if(node.name == "ActuatorAinAdvance" || node.name == "ActuatorBinAdvance" || node.name == "ActuatorCinAdvance" || node.name == "ActuatorAinRetreat" || node.name == "ActuatorBinRetreat" || node.name == "ActuatorCinRetreat") {
+        //     var data = new Date();
+        //     console.log(`[${data.getHours()}:${data.getMinutes()}:${data.getSeconds()}] ${node.name} = ${node.value}`);
+        // }
     }, []);
 
     // Handle initial state update

@@ -21,6 +21,9 @@ export const DEFAULT_EQUIPMENT_STATE: EquipamentSubscriptionResponse = {
     RobotRightToAntecipation: false,
     RobotRightIsGrabbed: false,
     CreateParts: false,
+    BluePartSelected: false,
+    GreenPartSelected: false,
+    MetalPartSelected: false,
 };
 
 /** Represents the backend contract for equipment states */
@@ -46,6 +49,9 @@ export interface EquipamentSubscriptionResponse {
     RobotRightToAntecipation: boolean;
     RobotRightIsGrabbed: boolean;
     CreateParts: boolean;
+    BluePartSelected: boolean;
+    GreenPartSelected: boolean;
+    MetalPartSelected: boolean;
 }
 
 /** Represents an OPC UA node response from the server */

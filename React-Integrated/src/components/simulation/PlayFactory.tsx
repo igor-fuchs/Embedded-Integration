@@ -17,6 +17,7 @@ const BASE_HEIGHT = 590;
 interface PartData {
     id: number;
     position: 'left' | 'right';
+    svgColor: 'metal' | 'green' | 'blue';
 }
 
 interface PlayFactoryProps {
@@ -75,13 +76,24 @@ export default function PlayFactory({ simulationStart, setSimulationStart, equip
 
     // Function to create 2 parts
     const createTwoParts = useCallback(() => {
+        let svgColor: 'metal' | 'green' | 'blue';
+        if (equipmentsValue.MetalPartSelected) {
+            svgColor = 'metal';
+        } else if (equipmentsValue.GreenPartSelected) {
+            svgColor = 'green';
+        } else if (equipmentsValue.BluePartSelected) {
+            svgColor = 'blue';
+        } else {
+            svgColor = 'metal';
+        }
+
         const newParts: PartData[] = [
-            { id: nextPartId.current, position: 'left' },
-            { id: nextPartId.current + 1, position: 'right' }
+            { id: nextPartId.current, position: 'left', svgColor },
+            { id: nextPartId.current + 1, position: 'right', svgColor }
         ];
         setParts(prev => [...prev, ...newParts]);
         nextPartId.current += 2;
-    }, []);
+    }, [equipmentsValue.MetalPartSelected, equipmentsValue.GreenPartSelected, equipmentsValue.BluePartSelected]);
 
     // Function to calculate the scale coefficient
     const getScaleCoefficient = () => {
@@ -305,6 +317,7 @@ export default function PlayFactory({ simulationStart, setSimulationStart, equip
                                     {parts.map((part) => (
                                         <Part
                                             key={part.id}
+                                            svgColor={part.svgColor}
                                             bodyIndex={90}
                                             bodyStyle={equipamentStyle({
                                                 width: 20,

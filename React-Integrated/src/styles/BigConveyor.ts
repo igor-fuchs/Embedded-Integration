@@ -12,6 +12,28 @@ export const StyleBigConveyor = styled.div<BigConveyorProps>`
     position: relative;
     overflow: hidden;
 
+    .stop-area{
+        position: absolute;
+        width: 30%;
+        height: 10%;
+        left: 0;
+        
+        &.metal{
+            background-color: rgba(192, 192, 192, 0.5);
+            z-index: 1000;
+        }
+
+        &.green{
+            background-color: rgba(0, 255, 0, 0.5);
+            z-index: 1000;
+        }
+
+        &.blue{
+            background-color: rgba(0, 0, 255, 0.5);
+            z-index: 1000;
+        }
+    }
+
     .body,
     .arch,
     .boxes {

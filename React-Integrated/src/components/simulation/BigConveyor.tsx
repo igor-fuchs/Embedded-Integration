@@ -63,7 +63,7 @@ export default function BigConveyor({ id, firstRef, secondRef, firstRunning, sec
             let speedMs: number;
 
             if (firstRef === ref) {
-                speedMs = totalMovement / animationDurationMs ; // condition to move copied from .CSS file (StyleBigConveyor)
+                speedMs = totalMovement / animationDurationMs; // condition to move copied from .CSS file (StyleBigConveyor)
             } else {
                 speedMs = totalMovement / (((secondBeltStyle.height as number) / (firstBeltStyle.height as number)) * animationDurationMs);
 
@@ -99,6 +99,10 @@ export default function BigConveyor({ id, firstRef, secondRef, firstRunning, sec
             </div>
 
             {/* Do not change the data-id, it is being used in the file Part.tsx */}
+            <div className="stop-area metal" style={{top: rampTopInPixels.a * scaleFactor}}/>
+            <div className="stop-area green" style={{top: rampTopInPixels.b * scaleFactor}}/>
+            <div className="stop-area blue" style={{top: rampTopInPixels.c * scaleFactor}}/>
+
             <div data-id="ramp-a" className="ramp-segment ramp-a" style={{ ...rampStyle, top: rampTopInPixels.c * scaleFactor, left: rampLeftInPixels * scaleFactor }} />
             <div data-id="ramp-b" className="ramp-segment ramp-b" style={{ ...rampStyle, top: rampTopInPixels.b * scaleFactor, left: rampLeftInPixels * scaleFactor }} />
             <div data-id="ramp-c" className="ramp-segment ramp-c" style={{ ...rampStyle, top: rampTopInPixels.a * scaleFactor, left: rampLeftInPixels * scaleFactor }} />
