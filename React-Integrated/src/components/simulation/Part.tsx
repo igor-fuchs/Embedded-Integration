@@ -32,6 +32,7 @@ interface PartProps {
         secondRef: React.RefObject<HTMLDivElement | null>;
         firstRunning: boolean;
         secondRunning: boolean;
+        onStopAreaReached: () => void;
     }
     actuatorA: {
         ref: React.RefObject<HTMLDivElement | null>;
@@ -59,6 +60,9 @@ export default function Part({ bodyIndex, svgColor, bodyStyle, conveyor, robot, 
 
     // Frozen flag
     const [isFinished, setIsFinished] = useState<boolean>(false);
+
+    // Big conveyor stop area flag - tracks if part is stopped in its color stop-area
+    const [isInBigConveyorStopArea, setIsInBigConveyorStopArea] = useState<boolean>(false);
 
     // Conveyor dependencies
     const conveyorAnimationID = useRef<number | null>(null);
@@ -358,12 +362,27 @@ export default function Part({ bodyIndex, svgColor, bodyStyle, conveyor, robot, 
 
     // Continuous monitoring for second big conveyor
     useEffect(() => {
-        if (isFinished) return;
+        if (isFinished || isInBigConveyorStopArea) return;
 
         let isActive = true;
 
         const monitorSecondConveyor = () => {
             if (!isActive) return;
+
+            // Check if part is completely inside its color-specific stop-area
+            const parentElement = bigConveyor.secondRef.current?.parentElement;
+            const stopAreaElement = parentElement?.querySelector(`.stop-area.${svgColor}`) as HTMLElement | null;
+            if (stopAreaElement && isCompletelyInside(partRef, stopAreaElement)) {
+                // Stop the animation
+                if (bigConveyorSecondAnimationID.current) {
+                    cancelAnimationFrame(bigConveyorSecondAnimationID.current);
+                    bigConveyorSecondAnimationID.current = null;
+                    bigConveyorSecondFrameTime.current = 0;
+                }
+                setIsInBigConveyorStopArea(true);
+                bigConveyor.onStopAreaReached(); // Notify parent to stop big conveyor
+                return; // Stop monitoring
+            }
 
             const touching = isTouching(partRef, bigConveyor.secondRef);
 
@@ -372,6 +391,20 @@ export default function Part({ bodyIndex, svgColor, bodyStyle, conveyor, robot, 
                 if (!bigConveyorSecondAnimationID.current) {
                     const animate = (currentTime: number) => {
                         if (!isActive) return;
+
+                        // Check stop-area again during animation
+                        const parent = bigConveyor.secondRef.current?.parentElement;
+                        const stopArea = parent?.querySelector(`.stop-area.${svgColor}`) as HTMLElement | null;
+                        if (stopArea && isCompletelyInside(partRef, stopArea)) {
+                            if (bigConveyorSecondAnimationID.current) {
+                                cancelAnimationFrame(bigConveyorSecondAnimationID.current);
+                                bigConveyorSecondAnimationID.current = null;
+                                bigConveyorSecondFrameTime.current = 0;
+                            }
+                            setIsInBigConveyorStopArea(true);
+                            bigConveyor.onStopAreaReached(); // Notify parent to stop big conveyor
+                            return;
+                        }
 
                         if (!bigConveyorSecondFrameTime.current) {
                             bigConveyorSecondFrameTime.current = currentTime;
@@ -422,7 +455,7 @@ export default function Part({ bodyIndex, svgColor, bodyStyle, conveyor, robot, 
                 bigConveyorSecondAnimationID.current = null;
             }
         };
-    }, [bigConveyor.secondRunning, bigConveyor.secondRef, scaleFactor, isFinished]);
+    }, [bigConveyor.secondRunning, bigConveyor.secondRef, scaleFactor, isFinished, isInBigConveyorStopArea, svgColor]);
     // #endregion
 
     // #region Actuators

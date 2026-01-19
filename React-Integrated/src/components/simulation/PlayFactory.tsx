@@ -39,6 +39,9 @@ export default function PlayFactory({ simulationStart, setSimulationStart, equip
     const [conveyorLeftStopped, setConveyorLeftStopped] = useState<boolean>(false);
     const [conveyorRightStopped, setConveyorRightStopped] = useState<boolean>(false);
 
+    // Big conveyor stop override state (when part reaches color-specific stop-area)
+    const [bigConveyorSecondStopped, setBigConveyorSecondStopped] = useState<boolean>(false);
+
     // Equipament auxs
     const [robotLeftMovement, setRobotLeftMovement] = useState<RobotMovement>({
         x: {
@@ -138,6 +141,11 @@ export default function PlayFactory({ simulationStart, setSimulationStart, equip
         setConveyorRightStopped(true);
     }, []);
 
+    // Callback for when part reaches big conveyor stop-area
+    const handleBigConveyorStopAreaReached = useCallback(() => {
+        setBigConveyorSecondStopped(true);
+    }, []);
+
     // Reset conveyor stopped state when robot grabs the part
     useEffect(() => {
         if (equipmentsValue.RobotLeftIsGrabbed && conveyorLeftStopped) {
@@ -150,6 +158,14 @@ export default function PlayFactory({ simulationStart, setSimulationStart, equip
             setConveyorRightStopped(false);
         }
     }, [equipmentsValue.RobotRightIsGrabbed, conveyorRightStopped]);
+
+    // Reset big conveyor stopped state when any actuator advances (pushes the part)
+    useEffect(() => {
+        const anyActuatorAdvancing = equipmentsValue.ActuatorAinAdvance || equipmentsValue.ActuatorBinAdvance || equipmentsValue.ActuatorCinAdvance;
+        if (anyActuatorAdvancing && bigConveyorSecondStopped) {
+            setBigConveyorSecondStopped(false);
+        }
+    }, [equipmentsValue.ActuatorAinAdvance, equipmentsValue.ActuatorBinAdvance, equipmentsValue.ActuatorCinAdvance, bigConveyorSecondStopped]);
 
     // Trigger createTwoParts when CreateParts becomes true
     useEffect(() => {
@@ -278,7 +294,7 @@ export default function PlayFactory({ simulationStart, setSimulationStart, equip
                                         firstBeltStyle={equipamentStyle({ width: 56, height: 97, bottom: 31, left: 0 })}
                                         secondBeltStyle={equipamentStyle({ width: 56, height: 243, bottom: 97 + 31, left: 0 })} // bottom = firstBeltStyle.height + firstBeltStyle.bottom
                                         firstRunning={equipmentsValue.BigConveyorFirstRunning}
-                                        secondRunning={equipmentsValue.BigConveyorSecondRunning}
+                                        secondRunning={equipmentsValue.BigConveyorSecondRunning && !bigConveyorSecondStopped}
                                         scaleFactor={getScaleCoefficient()}
                                     />
                                     <Actuator
@@ -342,7 +358,8 @@ export default function PlayFactory({ simulationStart, setSimulationStart, equip
                                                 firstRef: bigConveyorFirstRef,
                                                 secondRef: bigConveyorSecondRef,
                                                 firstRunning: equipmentsValue.BigConveyorFirstRunning,
-                                                secondRunning: equipmentsValue.BigConveyorSecondRunning,
+                                                secondRunning: equipmentsValue.BigConveyorSecondRunning && !bigConveyorSecondStopped,
+                                                onStopAreaReached: handleBigConveyorStopAreaReached,
                                             }}
                                             actuatorA={{
                                                 ref: actuatorARef,
