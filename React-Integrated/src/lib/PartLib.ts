@@ -18,6 +18,25 @@ export const isTouching = (
     return horizontalOverlap && verticalOverlap;
 };
 
+// Check if the part is completely inside an area
+export const isCompletelyInside = (
+    partRef: React.RefObject<HTMLDivElement | null>,
+    areaElement: HTMLElement | null
+): boolean => {
+    if (!partRef.current || !areaElement) return false;
+
+    const partRect = partRef.current.getBoundingClientRect();
+    const areaRect = areaElement.getBoundingClientRect();
+
+    // Check if part is completely inside the area
+    return (
+        partRect.left >= areaRect.left &&
+        partRect.right <= areaRect.right &&
+        partRect.top >= areaRect.top &&
+        partRect.bottom <= areaRect.bottom
+    );
+};
+
 type FollowConveyorAnimationParams = {
     conveyorRef: React.RefObject<HTMLDivElement | null>;
     frameTime: React.RefObject<number>;

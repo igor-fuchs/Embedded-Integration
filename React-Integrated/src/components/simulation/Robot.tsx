@@ -59,8 +59,8 @@ export default function Robot({ id, ref, bodyIndex, bodyStyle, moveToHome, moveT
 
         // Determine positions (x px, y px)
         const homePosition = { x: inverter(0), y: 0 };
-        const pickPosition = { x: inverter(0), y: 15 };
-        const anticipationPosition = { x: inverter(12.5), y: 12.5 };
+        const pickPosition = { x: inverter(0), y: 20 };
+        const anticipationPosition = { x: inverter(40.5), y: 12.5 };
         const dropPosition = { x: inverter(81.5), y: 15 };
 
         ref.current.dataset.homePosition = `${homePosition.x},${homePosition.y}`;

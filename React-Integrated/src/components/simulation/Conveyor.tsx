@@ -43,6 +43,10 @@ export default function Conveyor({ id, ref, bodyIndex, bodyStyle, beltStyle, run
                 <Conveyor4mBelt style={{ width: '100%', height: '100%' }} />
                 <Conveyor4mBelt style={{ width: '100%', height: '100%' }} />
             </div>
+
+            {/* Stop Animation Area */}
+            <div className='stop-area'/>
+
         </StyleConveyor>
     );
 }

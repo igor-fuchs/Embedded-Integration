@@ -34,6 +34,10 @@ export default function PlayFactory({ simulationStart, setSimulationStart, equip
     const nextPartId = useRef<number>(0);
     const lastCreatePartsRef = useRef<boolean>(false);
 
+    // Conveyor stop override states (when part reaches stop-area)
+    const [conveyorLeftStopped, setConveyorLeftStopped] = useState<boolean>(false);
+    const [conveyorRightStopped, setConveyorRightStopped] = useState<boolean>(false);
+
     // Equipament auxs
     const [robotLeftMovement, setRobotLeftMovement] = useState<RobotMovement>({
         x: {
@@ -113,6 +117,28 @@ export default function PlayFactory({ simulationStart, setSimulationStart, equip
         setSimulationStart(!simulationStart);
     }
 
+    // Callbacks for when parts reach stop-area
+    const handleLeftPartStopAreaReached = useCallback(() => {
+        setConveyorLeftStopped(true);
+    }, []);
+
+    const handleRightPartStopAreaReached = useCallback(() => {
+        setConveyorRightStopped(true);
+    }, []);
+
+    // Reset conveyor stopped state when robot grabs the part
+    useEffect(() => {
+        if (equipmentsValue.RobotLeftIsGrabbed && conveyorLeftStopped) {
+            setConveyorLeftStopped(false);
+        }
+    }, [equipmentsValue.RobotLeftIsGrabbed, conveyorLeftStopped]);
+
+    useEffect(() => {
+        if (equipmentsValue.RobotRightIsGrabbed && conveyorRightStopped) {
+            setConveyorRightStopped(false);
+        }
+    }, [equipmentsValue.RobotRightIsGrabbed, conveyorRightStopped]);
+
     // Trigger createTwoParts when CreateParts becomes true
     useEffect(() => {
         if (equipmentsValue.CreateParts && !lastCreatePartsRef.current) {
@@ -187,7 +213,7 @@ export default function PlayFactory({ simulationStart, setSimulationStart, equip
                                         bodyIndex={89}
                                         bodyStyle={equipamentStyle({ width: 68, height: 253, left: 404, bottom: 19 })}
                                         beltStyle={equipamentStyle({ width: 68, bottom: 31, left: 0 })}
-                                        running={equipmentsValue.ConveyorLeftRunning}
+                                        running={equipmentsValue.ConveyorLeftRunning && !conveyorLeftStopped}
                                         scaleFactor={getScaleCoefficient()}
                                     />
                                     <Robot
@@ -212,7 +238,7 @@ export default function PlayFactory({ simulationStart, setSimulationStart, equip
                                         bodyIndex={89}
                                         bodyStyle={equipamentStyle({ width: 68, height: 253, right: 388, bottom: 19 })}
                                         beltStyle={equipamentStyle({ width: 68, bottom: 31, right: 0 })}
-                                        running={equipmentsValue.ConveyorRightRunning}
+                                        running={equipmentsValue.ConveyorRightRunning && !conveyorRightStopped}
                                         scaleFactor={getScaleCoefficient()}
                                     />
                                     <Robot
@@ -283,13 +309,17 @@ export default function PlayFactory({ simulationStart, setSimulationStart, equip
                                             bodyStyle={equipamentStyle({
                                                 width: 20,
                                                 height: 20,
-                                                ...(part.position === 'left' ? { left: 430 } : { right: 410 }), // left: 510
-                                                bottom: 36 // 206
+                                                ...(part.position === 'left' ? { left: 430 } : { right: 410 }), // left: 510 (bigconveyor test)
+                                                bottom: 36 // 206 (bigconveyor test)
                                             })}
                                             conveyor={{
                                                 ref: part.position === 'left' ? conveyorLeftRef : conveyorRightRef,
-                                                running: part.position === 'left' ? equipmentsValue.ConveyorLeftRunning : equipmentsValue.ConveyorRightRunning,
+                                                running: part.position === 'left'
+                                                    ? (equipmentsValue.ConveyorLeftRunning && !conveyorLeftStopped)
+                                                    : (equipmentsValue.ConveyorRightRunning && !conveyorRightStopped),
+                                                onStopAreaReached: part.position === 'left' ? handleLeftPartStopAreaReached : handleRightPartStopAreaReached
                                             }}
+
                                             robot={{
                                                 ref: part.position === 'left' ? robotLeftRef : robotRightRef,
                                                 isGrabbed: part.position === 'left' ? equipmentsValue.RobotLeftIsGrabbed : equipmentsValue.RobotRightIsGrabbed,

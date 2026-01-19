@@ -14,7 +14,7 @@ export default function LiveDemo() {
 
     // Memoized handlers to prevent unnecessary reconnections
     const handleSimulationFrontNode = useCallback((node: OpcuaNodeResponse) => {
-        console.log('Simulation front node received:', node.name, node.value);
+        //console.log('Simulation front node received:', node.name, node.value);
 
         setEquipmentValue(prev => {
             // Ensure the node name exists in the equipment state
@@ -26,10 +26,17 @@ export default function LiveDemo() {
             }
             return prev;
         });
+
+        if(node.name == "ConveyorLeftRunning" || node.name == "ConveyorRightRunning") {
+            var data = new Date();
+            console.log(`[${data.getHours()}:${data.getMinutes()}:${data.getSeconds()}] ${node.name} = ${node.value}`);
+        }
     }, []);
 
     // Handle initial state update
     const handleSimulationFrontInitialState = useCallback((nodes: OpcuaNodeResponse[]) => {
+        console.log('Simulation front initial state received:', nodes);
+
         setEquipmentValue(prev => {
             const newState = { ...prev };
             nodes.forEach(node => {
