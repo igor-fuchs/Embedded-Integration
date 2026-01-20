@@ -169,11 +169,11 @@ export default function PlayFactory({ simulationStart, setSimulationStart, equip
 
     // Trigger createTwoParts when CreateParts becomes true
     useEffect(() => {
-        if (equipmentsValue.CreateParts && !lastCreatePartsRef.current) {
+        if ((equipmentsValue.BluePartSelected || equipmentsValue.GreenPartSelected || equipmentsValue.MetalPartSelected) && !lastCreatePartsRef.current) {
             createTwoParts();
         }
-
-    }, [equipmentsValue.CreateParts, createTwoParts]);
+        lastCreatePartsRef.current = (equipmentsValue.BluePartSelected || equipmentsValue.GreenPartSelected || equipmentsValue.MetalPartSelected);
+    }, [equipmentsValue.BluePartSelected, equipmentsValue.GreenPartSelected, equipmentsValue.MetalPartSelected, createTwoParts]);
 
     // Refresh dimensions on window resize
     useEffect(() => {

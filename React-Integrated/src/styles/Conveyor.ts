@@ -29,8 +29,8 @@ export const StyleConveyor = styled.div<ConveyorProps>`
         height: 28.5%;
         top: 0;
         left: 0;
-        background-color: rgba(255, 0, 0, 0.5);
-        z-index: 1000;
+        /* background-color: rgba(255, 0, 0, 0.5);
+        z-index: 1000; */
     }
 
     @keyframes conveyorMove {

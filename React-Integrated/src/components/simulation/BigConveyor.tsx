@@ -26,7 +26,8 @@ export default function BigConveyor({ id, firstRef, secondRef, firstRunning, sec
     const boxesIndex = bodyIndex + 3;
     const beltIndex = bodyIndex - 1;
 
-    const animationDurationMs = 5000;
+    const animationDurationMs = 2000;
+    const animationDurationSecondBeltMs = 7500;
 
     const rampLeftInPixels = 57;
     const rampTopInPixels = {
@@ -65,8 +66,7 @@ export default function BigConveyor({ id, firstRef, secondRef, firstRunning, sec
             if (firstRef === ref) {
                 speedMs = totalMovement / animationDurationMs; // condition to move copied from .CSS file (StyleBigConveyor)
             } else {
-                speedMs = totalMovement / (((secondBeltStyle.height as number) / (firstBeltStyle.height as number)) * animationDurationMs);
-
+                speedMs = totalMovement / animationDurationSecondBeltMs;
             }
 
             container.dataset.speedMs = speedMs.toString();
@@ -75,7 +75,7 @@ export default function BigConveyor({ id, firstRef, secondRef, firstRunning, sec
 
     return (
         <StyleBigConveyor
-            id={id} style={bodyStyle} $animationDurationMs={animationDurationMs}
+            id={id} style={bodyStyle} $animationDurationMs={animationDurationMs} $animationDurationSecondBeltMs={animationDurationSecondBeltMs}
             $firstRunning={firstRunning} $secondRunning={secondRunning}
             $firstHeight={firstBeltStyle.height as number} $secondHeight={secondBeltStyle.height as number}
         >

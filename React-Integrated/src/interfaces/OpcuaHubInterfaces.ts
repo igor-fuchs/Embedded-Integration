@@ -20,7 +20,6 @@ export const DEFAULT_EQUIPMENT_STATE: EquipamentSubscriptionResponse = {
     RobotRightToPick: false,
     RobotRightToAntecipation: false,
     RobotRightIsGrabbed: false,
-    CreateParts: false,
     BluePartSelected: false,
     GreenPartSelected: false,
     MetalPartSelected: false,
@@ -48,7 +47,6 @@ export interface EquipamentSubscriptionResponse {
     RobotRightToPick: boolean;
     RobotRightToAntecipation: boolean;
     RobotRightIsGrabbed: boolean;
-    CreateParts: boolean;
     BluePartSelected: boolean;
     GreenPartSelected: boolean;
     MetalPartSelected: boolean;
