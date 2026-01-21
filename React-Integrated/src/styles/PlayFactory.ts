@@ -146,14 +146,41 @@ export const StylePlayFactory = styled.div<{ height: number }>`
         }
     }
 
-    @media (max-width: 480px) {
-        .play-button {
+    @media (max-width: 768px) {
+        .play-button{
             width: 80px;
             height: 80px;
+
+            img{
+                width: 18.75px;
+                height: 25px;
+            }
+        }
+
+        .demo-preview {
+            gap: 20px;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .launch-button {
+            display: none;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .play-button {
+            width: 60px;
+            height: 60px;
+
+            img{
+                width: 12.75px;
+                height: 17px;
+            }
         }
 
         .preview-title {
-            font-size: 20px;
+            font-size: 18px;
             line-height: 28px;
         }
 
@@ -162,11 +189,8 @@ export const StylePlayFactory = styled.div<{ height: number }>`
             line-height: 20px;
         }
 
-        .launch-button {
-            width: 150px;
-            padding: 12px 0 8px 0;
-            height: 44px;
-            font-size: 15px;
+        .demo-preview {
+            gap: 8px;
         }
     }
 `;

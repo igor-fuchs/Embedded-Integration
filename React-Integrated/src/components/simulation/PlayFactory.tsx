@@ -191,13 +191,6 @@ export default function PlayFactory({ simulationStart, setSimulationStart, equip
     // #region Component Render
     return (
         <StylePlayFactory height={screenHeight} ref={screenRef}>
-            {/* Window Controls */}
-            <div className="window-controls">
-                <div className="control-dot green"></div>
-                <div className="control-dot yellow"></div>
-                <div className="control-dot blue"></div>
-            </div>
-
             {
                 // #region PlayButton
                 !simulationStart ? (

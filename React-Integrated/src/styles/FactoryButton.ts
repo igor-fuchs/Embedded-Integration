@@ -25,7 +25,7 @@ export const StyleFactoryButtons = styled.div`
         align-items: center;
         border-radius: 12px;
 
-        svg {
+        img {
             width: 20px;
             height: 16px;
         }
@@ -45,7 +45,7 @@ export const StyleFactoryButtons = styled.div`
         background: #2563eb;
         padding: 12px 16px;
 
-        svg {
+        img {
             width: 16px;
             height: 16px;
         }
@@ -76,5 +76,30 @@ export const StyleFactoryButtons = styled.div`
         .feature-card {
             width: 100%;
         }
+    
+    }
+
+    @media (max-width: 630px) {
+        .feature-icon.control{
+            padding: 6px 8px;
+        }
+
+        .feature-icon.assistant{
+            padding: 6px 8px;
+        }
+
+        .feature-icon.info{
+            padding: 6px 8px;
+        }
+
+        .feature-description{
+            display: none;
+        }
+
+        .feature-title{
+            font-size: 14px;
+            line-height: 20px;
+        }
+    
     }
 `;
