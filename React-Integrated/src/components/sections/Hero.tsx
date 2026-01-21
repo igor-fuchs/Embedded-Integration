@@ -1,10 +1,10 @@
-import { StyleHero } from "../.styles/Hero";
+import { StyleHero } from "@styles/Hero";
 import StatusIndicator from "./StatusIndicator";
-import PlayButtonIcon from '../../assets/icons/play-button-icon.svg';
-import GithubIcon from '../../assets/icons/github-icon.svg';
-import ArrowIcon from "../../assets/icons/arrow-icon.svg";
+import PlayButtonIcon from "@assets/icons/play-button-icon.svg";
+import GithubIcon from "@assets/icons/github-icon.svg";
+import ArrowIcon from "@assets/icons/arrow-icon.svg";
 import { useTranslation } from "react-i18next";
-import useScrollToSection from "../../hooks/useScrollToSection";
+import useScrollToSection from "@hooks/useScrollToSection";
 
 export default function Hero() {
     const { t } = useTranslation();

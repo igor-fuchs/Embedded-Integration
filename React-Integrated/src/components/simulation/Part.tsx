@@ -1,15 +1,26 @@
 import { useCallback, useEffect, useState, useRef } from 'react';
-import { StylePart } from '../.styles/Part';
-import { followConveyorAnimation, isTouching } from '../.lib/PartLib';
-import GreenPart from '../../assets/images/green-part.svg?react';
+import { StylePart } from '@styles/Part';
+import { isTouching, isCompletelyInside } from '../../lib/PartLib';
+import BluePart from '@assets/images/blue-part.svg?react';
+import GreenPart from '@assets/images/green-part.svg?react';
+import MetalPart from '@assets/images/metal-part.svg?react';
 import type { RobotMovement } from './Robot';
+
+// Mapping of SVG components based on color
+const PART_COMPONENTES = {
+    green: GreenPart,
+    blue: BluePart,
+    metal: MetalPart,
+} as const;
 
 interface PartProps {
     bodyIndex: number;
+    svgColor: 'metal' | 'green' | 'blue';
     bodyStyle: React.CSSProperties;
     conveyor: {
         ref: React.RefObject<HTMLDivElement | null>;
         running: boolean;
+        onStopAreaReached: () => void;
     };
     robot: {
         ref: React.RefObject<HTMLDivElement | null>;
@@ -17,8 +28,11 @@ interface PartProps {
         movement: RobotMovement;
     };
     bigConveyor: {
-        ref: React.RefObject<HTMLDivElement | null>;
-        running: boolean;
+        firstRef: React.RefObject<HTMLDivElement | null>;
+        secondRef: React.RefObject<HTMLDivElement | null>;
+        firstRunning: boolean;
+        secondRunning: boolean;
+        onStopAreaReached: () => void;
     }
     actuatorA: {
         ref: React.RefObject<HTMLDivElement | null>;
@@ -35,25 +49,33 @@ interface PartProps {
     scaleFactor: number;
 }
 
-export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyor, actuatorA, actuatorB, actuatorC, scaleFactor }: PartProps) {
+export default function Part({ bodyIndex, svgColor, bodyStyle, conveyor, robot, bigConveyor, actuatorA, actuatorB, actuatorC, scaleFactor }: PartProps) {
     // #region Refs, States, Callbacks
     const partRef = useRef<HTMLDivElement>(null);
     const [offset, setOffset] = useState({
         x: 0,
         y: 0,
     });
+    const PartComponent = PART_COMPONENTES[svgColor];
 
     // Frozen flag
     const [isFinished, setIsFinished] = useState<boolean>(false);
+
+    // Big conveyor stop area flag - tracks if part is stopped in its color stop-area
+    const [isInBigConveyorStopArea, setIsInBigConveyorStopArea] = useState<boolean>(false);
 
     // Conveyor dependencies
     const conveyorAnimationID = useRef<number | null>(null);
     const conveyorFrameTime = useRef<number>(0);
 
     //Big conveyor dependencies
-    const bigConveyorAnimationID = useRef<number | null>(null);
-    const bigConveyorFrameTime = useRef<number>(0);
     const [rampAnimation, setRampAnimation] = useState<number>(0);
+    const bigConveyorFirstAnimationID = useRef<number | null>(null);
+    const bigConveyorFirstFrameTime = useRef<number>(0);
+    const bigConveyorFirstMonitorID = useRef<number | null>(null);
+    const bigConveyorSecondAnimationID = useRef<number | null>(null);
+    const bigConveyorSecondFrameTime = useRef<number>(0);
+    const bigConveyorSecondMonitorID = useRef<number | null>(null);
 
     // Robot dependencies
     const previousRobotPosition = useRef({ x: null, y: null } as { x: number | null; y: number | null }); // Track previous robot position for incremental movement
@@ -78,7 +100,7 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
                     2: "ramp-c",
                 };
 
-                const parentElement = bigConveyor.ref.current!.parentElement!;
+                const parentElement = bigConveyor.secondRef.current!.parentElement!;
                 const targetRamp = parentElement.querySelector(`[data-id="${rampIdMap[index]}"]`) as HTMLElement;
                 const rampRect = targetRamp!.getBoundingClientRect();
 
@@ -119,17 +141,104 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
 
     // #region First Conveyor
     useEffect(() => {
-        if (isFinished) return;
-        followConveyorAnimation({
-            conveyorRef: conveyor.ref,
-            frameTime: conveyorFrameTime,
-            animationID: conveyorAnimationID,
-            running: conveyor.running,
-            touching: isTouching(partRef, conveyor.ref),
-            scaleFactor,
-            setOffset
-        });
-    }, [conveyor.running]);
+        if (isFinished || (robot.isGrabbed && isTouching(partRef, robot.ref))) {
+            // Cancel animation if stopped
+            if (conveyorAnimationID.current) {
+                cancelAnimationFrame(conveyorAnimationID.current);
+                conveyorAnimationID.current = null;
+            }
+            return;
+        }
+
+        let isActive = true;
+        let monitorID: number | null = null;
+
+        const monitorConveyor = () => {
+            if (!isActive) return;
+
+            // Check if part is completely inside the stop-area
+            const stopAreaElement = conveyor.ref.current?.querySelector('.stop-area') as HTMLElement | null;
+            if (stopAreaElement && isCompletelyInside(partRef, stopAreaElement)) {
+                // Stop the animation
+                if (conveyorAnimationID.current) {
+                    cancelAnimationFrame(conveyorAnimationID.current);
+                    conveyorAnimationID.current = null;
+                    conveyorFrameTime.current = 0;
+                }
+                conveyor.onStopAreaReached(); // Notify parent to stop conveyor
+                return; // Stop monitoring
+            }
+
+            const touching = isTouching(partRef, conveyor.ref);
+
+            if (conveyor.running && touching) {
+                // Start animation if not already running
+                if (!conveyorAnimationID.current) {
+                    const animate = (currentTime: number) => {
+                        if (!isActive) return;
+
+                        // Check stop-area again during animation
+                        const stopArea = conveyor.ref.current?.querySelector('.stop-area') as HTMLElement | null;
+                        if (stopArea && isCompletelyInside(partRef, stopArea)) {
+                            if (conveyorAnimationID.current) {
+                                cancelAnimationFrame(conveyorAnimationID.current);
+                                conveyorAnimationID.current = null;
+                                conveyorFrameTime.current = 0;
+                            }
+                            conveyor.onStopAreaReached(); // Notify parent to stop conveyor
+                            return;
+                        }
+
+                        if (!conveyorFrameTime.current) {
+                            conveyorFrameTime.current = currentTime;
+                        }
+
+                        const deltaTime = currentTime - conveyorFrameTime.current;
+
+                        if (deltaTime > 0) {
+                            const speed = parseFloat(
+                                conveyor.ref.current?.dataset.speedMs || "0"
+                            );
+                            setOffset((prev) => ({
+                                ...prev,
+                                y: prev.y - (speed * deltaTime) / scaleFactor,
+                            }));
+                            conveyorFrameTime.current = currentTime;
+                        }
+
+                        conveyorAnimationID.current = requestAnimationFrame(animate);
+                    };
+
+                    conveyorFrameTime.current = 0;
+                    conveyorAnimationID.current = requestAnimationFrame(animate);
+                }
+            } else {
+                // Stop animation if not touching or not running
+                if (conveyorAnimationID.current) {
+                    cancelAnimationFrame(conveyorAnimationID.current);
+                    conveyorAnimationID.current = null;
+                    conveyorFrameTime.current = 0;
+                }
+            }
+
+            // Continue monitoring
+            monitorID = requestAnimationFrame(monitorConveyor);
+        };
+
+        monitorID = requestAnimationFrame(monitorConveyor);
+
+        return () => {
+            isActive = false;
+            if (monitorID) {
+                cancelAnimationFrame(monitorID);
+                monitorID = null;
+            }
+            if (conveyorAnimationID.current) {
+                cancelAnimationFrame(conveyorAnimationID.current);
+                conveyorAnimationID.current = null;
+            }
+        };
+    }, [conveyor.running, scaleFactor, isFinished, robot.isGrabbed]);
     // #endregion
 
     // #region Robot
@@ -169,7 +278,7 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
 
             // Extract and combine transitions (use the one that's not default)
             const xTransitionMs = robot.movement.x.transitionMs;
-            const yTransitionMs = robot.movement.y.transitionMs; // Check if in the future we need to combine both
+            //const yTransitionMs = robot.movement.y.transitionMs; // Check if in the future we need to combine both
 
             // Apply transition (prefer the x transition)
             const transition = `transform ${xTransitionMs}ms ease`;
@@ -181,20 +290,172 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
     }, [robot.isGrabbed, robot.movement]);
     // #endregion
 
-    // #region Big Conveyor
-    useEffect(() => {
-        if (isFinished) return;
-        followConveyorAnimation({
-            conveyorRef: bigConveyor.ref,
-            frameTime: bigConveyorFrameTime,
-            animationID: bigConveyorAnimationID,
-            running: bigConveyor.running,
-            touching: isTouching(partRef, bigConveyor.ref),
-            scaleFactor,
-            setOffset
-        });
+    // #region Big Conveyor 
 
-    }, [bigConveyor.running]);
+    // Continuous monitoring for first big conveyor
+    useEffect(() => {
+        if (isFinished || (robot.isGrabbed && isTouching(partRef, robot.ref))) return;
+
+        let isActive = true;
+
+        const monitorFirstConveyor = () => {
+            if (!isActive) return;
+
+            const touching = isTouching(partRef, bigConveyor.firstRef);
+
+            if (bigConveyor.firstRunning && touching) {
+                // Start animation if not already running
+                if (!bigConveyorFirstAnimationID.current) {
+                    const animate = (currentTime: number) => {
+                        if (!isActive) return;
+
+                        if (!bigConveyorFirstFrameTime.current) {
+                            bigConveyorFirstFrameTime.current = currentTime;
+                        }
+
+                        const deltaTime = currentTime - bigConveyorFirstFrameTime.current;
+
+                        if (deltaTime > 0) {
+                            const speed = parseFloat(
+                                bigConveyor.firstRef.current?.dataset.speedMs || "0"
+                            );
+                            setOffset((prev) => ({
+                                ...prev,
+                                y: prev.y - (speed * deltaTime) / scaleFactor,
+                            }));
+                            bigConveyorFirstFrameTime.current = currentTime;
+                        }
+
+                        bigConveyorFirstAnimationID.current = requestAnimationFrame(animate);
+                    };
+
+                    bigConveyorFirstFrameTime.current = 0;
+                    bigConveyorFirstAnimationID.current = requestAnimationFrame(animate);
+                }
+            } else {
+                // Stop animation if running
+                if (bigConveyorFirstAnimationID.current) {
+                    cancelAnimationFrame(bigConveyorFirstAnimationID.current);
+                    bigConveyorFirstAnimationID.current = null;
+                    bigConveyorFirstFrameTime.current = 0;
+                }
+            }
+
+            // Continue monitoring
+            bigConveyorFirstMonitorID.current = requestAnimationFrame(monitorFirstConveyor);
+        };
+
+        bigConveyorFirstMonitorID.current = requestAnimationFrame(monitorFirstConveyor);
+
+        return () => {
+            isActive = false;
+            if (bigConveyorFirstMonitorID.current) {
+                cancelAnimationFrame(bigConveyorFirstMonitorID.current);
+                bigConveyorFirstMonitorID.current = null;
+            }
+            if (bigConveyorFirstAnimationID.current) {
+                cancelAnimationFrame(bigConveyorFirstAnimationID.current);
+                bigConveyorFirstAnimationID.current = null;
+            }
+        };
+    }, [bigConveyor.firstRunning, bigConveyor.firstRef, scaleFactor, isFinished]);
+
+    // Continuous monitoring for second big conveyor
+    useEffect(() => {
+        if (isFinished || isInBigConveyorStopArea) return;
+
+        let isActive = true;
+
+        const monitorSecondConveyor = () => {
+            if (!isActive) return;
+
+            // Check if part is completely inside its color-specific stop-area
+            const parentElement = bigConveyor.secondRef.current?.parentElement;
+            const stopAreaElement = parentElement?.querySelector(`.stop-area.${svgColor}`) as HTMLElement | null;
+            if (stopAreaElement && isCompletelyInside(partRef, stopAreaElement)) {
+                // Stop the animation
+                if (bigConveyorSecondAnimationID.current) {
+                    cancelAnimationFrame(bigConveyorSecondAnimationID.current);
+                    bigConveyorSecondAnimationID.current = null;
+                    bigConveyorSecondFrameTime.current = 0;
+                }
+                setIsInBigConveyorStopArea(true);
+                bigConveyor.onStopAreaReached(); // Notify parent to stop big conveyor
+                return; // Stop monitoring
+            }
+
+            const touching = isTouching(partRef, bigConveyor.secondRef);
+
+            if (bigConveyor.secondRunning && touching) {
+                // Start animation if not already running
+                if (!bigConveyorSecondAnimationID.current) {
+                    const animate = (currentTime: number) => {
+                        if (!isActive) return;
+
+                        // Check stop-area again during animation
+                        const parent = bigConveyor.secondRef.current?.parentElement;
+                        const stopArea = parent?.querySelector(`.stop-area.${svgColor}`) as HTMLElement | null;
+                        if (stopArea && isCompletelyInside(partRef, stopArea)) {
+                            if (bigConveyorSecondAnimationID.current) {
+                                cancelAnimationFrame(bigConveyorSecondAnimationID.current);
+                                bigConveyorSecondAnimationID.current = null;
+                                bigConveyorSecondFrameTime.current = 0;
+                            }
+                            setIsInBigConveyorStopArea(true);
+                            bigConveyor.onStopAreaReached(); // Notify parent to stop big conveyor
+                            return;
+                        }
+
+                        if (!bigConveyorSecondFrameTime.current) {
+                            bigConveyorSecondFrameTime.current = currentTime;
+                        }
+
+                        const deltaTime = currentTime - bigConveyorSecondFrameTime.current;
+
+                        if (deltaTime > 0) {
+                            const speed = parseFloat(
+                                bigConveyor.secondRef.current?.dataset.speedMs || "0"
+                            );
+                            setOffset((prev) => ({
+                                ...prev,
+                                y: prev.y - (speed * deltaTime) / scaleFactor,
+                            }));
+                            bigConveyorSecondFrameTime.current = currentTime;
+                        }
+
+                        bigConveyorSecondAnimationID.current = requestAnimationFrame(animate);
+                    };
+
+                    bigConveyorSecondFrameTime.current = 0;
+                    bigConveyorSecondAnimationID.current = requestAnimationFrame(animate);
+                }
+            } else {
+                // Stop animation if running
+                if (bigConveyorSecondAnimationID.current) {
+                    cancelAnimationFrame(bigConveyorSecondAnimationID.current);
+                    bigConveyorSecondAnimationID.current = null;
+                    bigConveyorSecondFrameTime.current = 0;
+                }
+            }
+
+            // Continue monitoring
+            bigConveyorSecondMonitorID.current = requestAnimationFrame(monitorSecondConveyor);
+        };
+
+        bigConveyorSecondMonitorID.current = requestAnimationFrame(monitorSecondConveyor);
+
+        return () => {
+            isActive = false;
+            if (bigConveyorSecondMonitorID.current) {
+                cancelAnimationFrame(bigConveyorSecondMonitorID.current);
+                bigConveyorSecondMonitorID.current = null;
+            }
+            if (bigConveyorSecondAnimationID.current) {
+                cancelAnimationFrame(bigConveyorSecondAnimationID.current);
+                bigConveyorSecondAnimationID.current = null;
+            }
+        };
+    }, [bigConveyor.secondRunning, bigConveyor.secondRef, scaleFactor, isFinished, isInBigConveyorStopArea, svgColor]);
     // #endregion
 
     // #region Actuators
@@ -241,9 +502,9 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
     useEffect(() => {
         if (isFinished) return;
         if (rampAnimation === 0) return;
-        if (!partRef.current || !bigConveyor.ref.current) return;
+        if (!partRef.current || !bigConveyor.secondRef.current) return;
 
-        const parentElement = bigConveyor.ref.current.parentElement;
+        const parentElement = bigConveyor.secondRef.current.parentElement;
         if (!parentElement) return;
 
         const rampIdMap: Record<number, string> = {
@@ -305,7 +566,7 @@ export default function Part({ bodyIndex, bodyStyle, conveyor, robot, bigConveyo
             $xOffset={offset.x * scaleFactor}
             $yOffset={offset.y * scaleFactor}
         >
-            <GreenPart className='part' />
+            <PartComponent className='part' />
         </StylePart>
     );
     // #endregion

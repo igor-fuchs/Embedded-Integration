@@ -1,11 +1,11 @@
-import { StyleRobot } from "../.styles/Robot"
+import { StyleRobot } from "@styles/Robot"
 import React, { useEffect, useRef } from "react";
-import RobotRightBody from "../../assets/images/robot-right-body.svg?react";
-import RobotRightAxisX from "../../assets/images/robot-right-axis-x.svg?react";
-import RobotRightAxisY from "../../assets/images/robot-right-axis-y.svg?react";
-import RobotLeftBody from "../../assets/images/robot-left-body.svg?react";
-import RobotLeftAxisX from "../../assets/images/robot-left-axis-x.svg?react";
-import RobotLeftAxisY from "../../assets/images/robot-left-axis-y.svg?react";
+import RobotRightBody from "@assets/images/robot-right-body.svg?react";
+import RobotRightAxisX from "@assets/images/robot-right-axis-x.svg?react";
+import RobotRightAxisY from "@assets/images/robot-right-axis-y.svg?react";
+import RobotLeftBody from "@assets/images/robot-left-body.svg?react";
+import RobotLeftAxisX from "@assets/images/robot-left-axis-x.svg?react";
+import RobotLeftAxisY from "@assets/images/robot-left-axis-y.svg?react";
 
 export interface RobotMovement {
     x: {
@@ -59,8 +59,8 @@ export default function Robot({ id, ref, bodyIndex, bodyStyle, moveToHome, moveT
 
         // Determine positions (x px, y px)
         const homePosition = { x: inverter(0), y: 0 };
-        const pickPosition = { x: inverter(0), y: 15 };
-        const anticipationPosition = { x: inverter(12.5), y: 12.5 };
+        const pickPosition = { x: inverter(0), y: 20 };
+        const anticipationPosition = { x: inverter(40.5), y: 12.5 };
         const dropPosition = { x: inverter(81.5), y: 15 };
 
         ref.current.dataset.homePosition = `${homePosition.x},${homePosition.y}`;

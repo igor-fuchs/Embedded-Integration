@@ -1,4 +1,4 @@
-import { StyleStatusIndicator } from "../.styles/StatusIndicator";
+import { StyleStatusIndicator } from "@styles/StatusIndicator";
 
 export interface StatusIndicatorProps {
     id: string;

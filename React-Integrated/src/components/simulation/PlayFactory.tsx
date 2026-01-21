@@ -1,15 +1,14 @@
-import { StylePlayFactory } from '../.styles/PlayFactory';
-import { useState, useEffect, useRef } from 'react';
+import { StylePlayFactory } from '@styles/PlayFactory';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from "react-i18next";
 import BigConveyor from './BigConveyor';
 import Conveyor from './Conveyor';
 import Robot, { type RobotMovement } from './Robot';
 import Actuator from './Actuator';
 import Part from './Part';
-import PlayButtonIcon from '../../assets/icons/play-button-icon.svg';
-import FactoryBackground from '../../assets/images/factory-background.svg';
-
-// Adicionar um efeito de sombra no arco da esteira para dar profundidade 
+import PlayButtonIcon from '@assets/icons/play-button-icon.svg';
+import FactoryBackground from '@assets/images/factory-background.svg';
+import type { EquipamentSubscriptionResponse } from '@interfaces/OpcuaHubInterfaces';
 
 const BASE_WIDTH = 1024;
 const BASE_HEIGHT = 590;
@@ -18,64 +17,30 @@ const BASE_HEIGHT = 590;
 interface PartData {
     id: number;
     position: 'left' | 'right';
+    svgColor: 'metal' | 'green' | 'blue';
 }
 
-export function PlayFactory() {
-    // #region Test States
-    // Test variables after delete
-    const [bigConveyorRunning, setBigConveyorRunning] = useState<boolean>(false);
-    const [conveyorLeftRunning, setConveyorLeftRunning] = useState<boolean>(false);
-    const [conveyorRightRunning, setConveyorRightRunning] = useState<boolean>(false);
-    const [robotLeftMoving, setRobotLeftMoving] = useState<{
-        toHome: boolean;
-        toPick: boolean;
-        toAntecipation: boolean;
-        toDrop: boolean;
-        isGrabbed: boolean;
-    }>({
-        toHome: false,
-        toPick: false,
-        toAntecipation: false,
-        toDrop: false,
-        isGrabbed: false,
-    });
-    const [robotRightMoving, setRobotRightMoving] = useState<{
-        toHome: boolean;
-        toPick: boolean;
-        toAntecipation: boolean;
-        toDrop: boolean;
-        isGrabbed: boolean;
-    }>({
-        toHome: false,
-        toPick: false,
-        toAntecipation: false,
-        toDrop: false,
-        isGrabbed: false,
-    });
-    const [actuatorAMoving, setActuatorAMoving] = useState<{ retract: boolean, advance: boolean }>({ retract: false, advance: false });
-    const [actuatorBMoving, setActuatorBMoving] = useState<{ retract: boolean, advance: boolean }>({ retract: false, advance: false });
-    const [actuatorCMoving, setActuatorCMoving] = useState<{ retract: boolean, advance: boolean }>({ retract: false, advance: false });
+interface PlayFactoryProps {
+    simulationStart: boolean;
+    setSimulationStart: React.Dispatch<React.SetStateAction<boolean>>;
+    equipmentsValue: EquipamentSubscriptionResponse;
+}
 
-    const styleTestButtons = (value: boolean): React.CSSProperties => ({
-        padding: '10px 10px',
-        backgroundColor: value ? 'rgba(76, 175, 80, 0.7)' : 'rgba(200, 200, 200, 0.5)',
-        color: 'white',
-        border: 'none',
-        borderRadius: '4px',
-        cursor: 'pointer',
-        fontSize: '12px',
-        fontWeight: 'bold',
-    });
-
-    // #endregion
-
+export default function PlayFactory({ simulationStart, setSimulationStart, equipmentsValue }: PlayFactoryProps) {
     // #region States, Refs
     const { t } = useTranslation();
-    const [simulationStart, setSimulationStart] = useState<boolean>(false);
     const [screenHeight, setScreenHeight] = useState<number>(BASE_HEIGHT);
     const [parts, setParts] = useState<PartData[]>([]);
     const screenRef = useRef<HTMLDivElement>(null);
     const nextPartId = useRef<number>(0);
+    const lastCreatePartsRef = useRef<boolean>(false);
+
+    // Conveyor stop override states (when part reaches stop-area)
+    const [conveyorLeftStopped, setConveyorLeftStopped] = useState<boolean>(false);
+    const [conveyorRightStopped, setConveyorRightStopped] = useState<boolean>(false);
+
+    // Big conveyor stop override state (when part reaches color-specific stop-area)
+    const [bigConveyorSecondStopped, setBigConveyorSecondStopped] = useState<boolean>(false);
 
     // Equipament auxs
     const [robotLeftMovement, setRobotLeftMovement] = useState<RobotMovement>({
@@ -102,7 +67,8 @@ export function PlayFactory() {
     const conveyorRightRef = useRef<HTMLDivElement>(null);
     const robotLeftRef = useRef<HTMLDivElement>(null);
     const robotRightRef = useRef<HTMLDivElement>(null);
-    const bigConveyorRef = useRef<HTMLDivElement>(null);
+    const bigConveyorFirstRef = useRef<HTMLDivElement>(null);
+    const bigConveyorSecondRef = useRef<HTMLDivElement>(null);
     const actuatorCRef = useRef<HTMLDivElement>(null);
     const actuatorBRef = useRef<HTMLDivElement>(null);
     const actuatorARef = useRef<HTMLDivElement>(null);
@@ -112,14 +78,25 @@ export function PlayFactory() {
     // #region Functions, Callbacks
 
     // Function to create 2 parts
-    const createTwoParts = () => {
+    const createTwoParts = useCallback(() => {
+        let svgColor: 'metal' | 'green' | 'blue';
+        if (equipmentsValue.MetalPartSelected) {
+            svgColor = 'metal';
+        } else if (equipmentsValue.GreenPartSelected) {
+            svgColor = 'green';
+        } else if (equipmentsValue.BluePartSelected) {
+            svgColor = 'blue';
+        } else {
+            svgColor = 'metal';
+        }
+
         const newParts: PartData[] = [
-            { id: nextPartId.current, position: 'left' },
-            { id: nextPartId.current + 1, position: 'right' }
+            { id: nextPartId.current, position: 'left', svgColor },
+            { id: nextPartId.current + 1, position: 'right', svgColor }
         ];
         setParts(prev => [...prev, ...newParts]);
         nextPartId.current += 2;
-    };
+    }, [equipmentsValue.MetalPartSelected, equipmentsValue.GreenPartSelected, equipmentsValue.BluePartSelected]);
 
     // Function to calculate the scale coefficient
     const getScaleCoefficient = () => {
@@ -155,6 +132,49 @@ export function PlayFactory() {
         setSimulationStart(!simulationStart);
     }
 
+    // Callbacks for when parts reach stop-area
+    const handleLeftPartStopAreaReached = useCallback(() => {
+        setConveyorLeftStopped(true);
+    }, []);
+
+    const handleRightPartStopAreaReached = useCallback(() => {
+        setConveyorRightStopped(true);
+    }, []);
+
+    // Callback for when part reaches big conveyor stop-area
+    const handleBigConveyorStopAreaReached = useCallback(() => {
+        setBigConveyorSecondStopped(true);
+    }, []);
+
+    // Reset conveyor stopped state when robot grabs the part
+    useEffect(() => {
+        if (equipmentsValue.RobotLeftToAntecipation && conveyorLeftStopped) {
+            setConveyorLeftStopped(false);
+        }
+    }, [equipmentsValue.RobotLeftToAntecipation, conveyorLeftStopped]);
+
+    useEffect(() => {
+        if (equipmentsValue.RobotRightToAntecipation && conveyorRightStopped) {
+            setConveyorRightStopped(false);
+        }
+    }, [equipmentsValue.RobotRightToAntecipation, conveyorRightStopped]);
+
+    // Reset big conveyor stopped state when any actuator advances (pushes the part)
+    useEffect(() => {
+        const anyActuatorAdvancing = equipmentsValue.ActuatorAinAdvance || equipmentsValue.ActuatorBinAdvance || equipmentsValue.ActuatorCinAdvance;
+        if (anyActuatorAdvancing && bigConveyorSecondStopped) {
+            setBigConveyorSecondStopped(false);
+        }
+    }, [equipmentsValue.ActuatorAinAdvance, equipmentsValue.ActuatorBinAdvance, equipmentsValue.ActuatorCinAdvance, bigConveyorSecondStopped]);
+
+    // Trigger createTwoParts when CreateParts becomes true
+    useEffect(() => {
+        if ((equipmentsValue.BluePartSelected || equipmentsValue.GreenPartSelected || equipmentsValue.MetalPartSelected) && !lastCreatePartsRef.current) {
+            createTwoParts();
+        }
+        lastCreatePartsRef.current = (equipmentsValue.BluePartSelected || equipmentsValue.GreenPartSelected || equipmentsValue.MetalPartSelected);
+    }, [equipmentsValue.BluePartSelected, equipmentsValue.GreenPartSelected, equipmentsValue.MetalPartSelected, createTwoParts]);
+
     // Refresh dimensions on window resize
     useEffect(() => {
         const updateDimensions = () => {
@@ -171,317 +191,6 @@ export function PlayFactory() {
     // #region Component Render
     return (
         <StylePlayFactory height={screenHeight} ref={screenRef}>
-            {/* Window Controls */}
-            <div className="window-controls">
-                <div className="control-dot green"></div>
-                <div className="control-dot yellow"></div>
-                <div className="control-dot blue"></div>
-            </div>
-
-            {/* Test Buttons - Remove after validation */}
-            <div style={{
-                position: 'absolute',
-                top: '20px',
-                left: '20px',
-                zIndex: 9999,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '10px'
-            }}>
-                {/* Left Conveyor Control */}
-                <button
-                    onClick={() => setConveyorLeftRunning(!conveyorLeftRunning)}
-                    style={{
-                        padding: '10px 15px',
-                        backgroundColor: conveyorLeftRunning ? 'rgba(76, 175, 80, 0.7)' : 'rgba(200, 200, 200, 0.5)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px',
-                        fontWeight: 'bold',
-                        minWidth: '150px',
-                    }}
-                >
-                    Left Conveyor: {conveyorLeftRunning ? 'ON' : 'OFF'}
-                </button>
-
-                {/* Left Robot Home Control */}
-                <button
-                    onClick={() => setRobotLeftMoving({ ...robotLeftMoving, toHome: !robotLeftMoving.toHome })}
-                    style={{
-                        padding: '10px 15px',
-                        backgroundColor: robotLeftMoving.toHome ? 'rgba(76, 175, 80, 0.7)' : 'rgba(200, 200, 200, 0.5)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px',
-                        fontWeight: 'bold',
-                        minWidth: '150px',
-                    }}
-                >
-                    Left Robot Home: {robotLeftMoving.toHome ? 'ON' : 'OFF'}
-                </button>
-
-                {/* Left Robot Pick Control */}
-                <button
-                    onClick={() => setRobotLeftMoving({ ...robotLeftMoving, toPick: !robotLeftMoving.toPick })}
-                    style={{
-                        padding: '10px 15px',
-                        backgroundColor: robotLeftMoving.toPick ? 'rgba(76, 175, 80, 0.7)' : 'rgba(200, 200, 200, 0.5)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px',
-                        fontWeight: 'bold',
-                        minWidth: '150px',
-                    }}
-                >
-                    Left Robot Pick: {robotLeftMoving.toPick ? 'ON' : 'OFF'}
-                </button>
-
-                {/* Left Robot Antecipation Control */}
-                <button
-                    onClick={() => setRobotLeftMoving({ ...robotLeftMoving, toHome: !robotLeftMoving.toAntecipation })}
-                    style={{
-                        padding: '10px 15px',
-                        backgroundColor: robotLeftMoving.toAntecipation ? 'rgba(76, 175, 80, 0.7)' : 'rgba(200, 200, 200, 0.5)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px',
-                        fontWeight: 'bold',
-                        minWidth: '150px',
-                    }}
-                >
-                    Left Robot Antecipation: {robotLeftMoving.toAntecipation ? 'ON' : 'OFF'}
-                </button>
-
-                {/* Left Robot Drop Control */}
-                <button
-                    onClick={() => setRobotLeftMoving({ ...robotLeftMoving, toDrop: !robotLeftMoving.toDrop })}
-                    style={{
-                        padding: '10px 15px',
-                        backgroundColor: robotLeftMoving.toDrop ? 'rgba(76, 175, 80, 0.7)' : 'rgba(200, 200, 200, 0.5)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px',
-                        fontWeight: 'bold',
-                        minWidth: '150px',
-                    }}
-                >
-                    Left Robot Drop: {robotLeftMoving.toDrop ? 'ON' : 'OFF'}
-                </button>
-
-                {/* Left Robot Grab */}
-                <button
-                    onClick={() => setRobotLeftMoving({ ...robotLeftMoving, isGrabbed: !robotLeftMoving.isGrabbed })}
-                    style={{
-                        padding: '10px 15px',
-                        backgroundColor: robotLeftMoving.isGrabbed ? 'rgba(76, 175, 80, 0.7)' : 'rgba(200, 200, 200, 0.5)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px',
-                        fontWeight: 'bold',
-                        minWidth: '150px',
-                    }}
-                >
-                    Left Robot Grab: {robotLeftMoving.isGrabbed ? 'ON' : 'OFF'}
-                </button>
-
-                {/* SPACE BETWEEN */}
-                <button
-                    style={{
-                        padding: '10px 15px',
-                        backgroundColor: 'transparent',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px',
-                        fontWeight: 'bold',
-                        minWidth: '150px',
-                    }}
-                >
-                   
-                </button>
-
-                {/* Right Conveyor Control */}
-                <button
-                    onClick={() => setConveyorRightRunning(!conveyorRightRunning)}
-                    style={{
-                        padding: '10px 15px',
-                        backgroundColor: conveyorRightRunning ? 'rgba(76, 175, 80, 0.7)' : 'rgba(200, 200, 200, 0.5)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px',
-                        fontWeight: 'bold',
-                        minWidth: '150px',
-                    }}
-                >
-                    Right Conveyor: {conveyorRightRunning ? 'ON' : 'OFF'}
-                </button>
-
-                {/* Right Robot Home Control */}
-                <button
-                    onClick={() => setRobotRightMoving({ ...robotRightMoving, toHome: !robotRightMoving.toHome })}
-                    style={{
-                        padding: '10px 15px',
-                        backgroundColor: robotRightMoving.toHome ? 'rgba(76, 175, 80, 0.7)' : 'rgba(200, 200, 200, 0.5)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px',
-                        fontWeight: 'bold',
-                        minWidth: '150px',
-                    }}
-                >
-                    Right Robot Home: {robotRightMoving.toHome ? 'ON' : 'OFF'}
-                </button>
-
-                {/* Right Robot Pick Control */}
-                <button
-                    onClick={() => setRobotRightMoving({ ...robotRightMoving, toPick: !robotRightMoving.toPick })}
-                    style={{
-                        padding: '10px 15px',
-                        backgroundColor: robotRightMoving.toPick ? 'rgba(76, 175, 80, 0.7)' : 'rgba(200, 200, 200, 0.5)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px',
-                        fontWeight: 'bold',
-                        minWidth: '150px',
-                    }}
-                >
-                    Right Robot Pick: {robotRightMoving.toPick ? 'ON' : 'OFF'}
-                </button>
-
-                {/* Right Robot Antecipation Control */}
-                <button
-                    onClick={() => setRobotRightMoving({ ...robotRightMoving, toAntecipation: !robotRightMoving.toAntecipation })}
-                    style={{
-                        padding: '10px 15px',
-                        backgroundColor: robotRightMoving.toAntecipation ? 'rgba(76, 175, 80, 0.7)' : 'rgba(200, 200, 200, 0.5)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px',
-                        fontWeight: 'bold',
-                        minWidth: '150px',
-                    }}
-                >
-                    Right Robot Antecipation: {robotRightMoving.toAntecipation ? 'ON' : 'OFF'}
-                </button>
-
-                {/* Right Robot Drop Control */}
-                <button
-                    onClick={() => setRobotRightMoving({ ...robotRightMoving, toDrop: !robotRightMoving.toDrop })}
-                    style={{
-                        padding: '10px 15px',
-                        backgroundColor: robotRightMoving.toDrop ? 'rgba(76, 175, 80, 0.7)' : 'rgba(200, 200, 200, 0.5)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px',
-                        fontWeight: 'bold',
-                        minWidth: '150px',
-                    }}
-                >
-                    Right Robot Drop: {robotRightMoving.toDrop ? 'ON' : 'OFF'}
-                </button>
-
-                {/* Right Robot Grab */}
-                <button
-                    onClick={() => setRobotRightMoving({ ...robotRightMoving, isGrabbed: !robotRightMoving.isGrabbed })}
-                    style={{
-                        padding: '10px 15px',
-                        backgroundColor: robotRightMoving.isGrabbed ? 'rgba(76, 175, 80, 0.7)' : 'rgba(200, 200, 200, 0.5)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px',
-                        fontWeight: 'bold',
-                        minWidth: '150px',
-                    }}
-                >
-                    Right Robot Grab: {robotRightMoving.isGrabbed ? 'ON' : 'OFF'}
-                </button>
-            </div>
-
-            <div style={{
-                position: 'absolute',
-                top: '20px',
-                right: '20px',
-                zIndex: 9999,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '10px'
-            }}>
-                {/* Big Conveyor Running Button */}
-                <button
-                    onClick={() => setBigConveyorRunning(!bigConveyorRunning)}
-                    style={styleTestButtons(bigConveyorRunning)}
-                >
-                    Big Conveyor: {bigConveyorRunning ? 'ON' : 'OFF'}
-                </button>
-
-                {/* Actuator A Advance Button */}
-                <button
-                    onClick={() => setActuatorAMoving({ ...actuatorAMoving, advance: !actuatorAMoving.advance, retract: actuatorAMoving.advance })}
-                    style={styleTestButtons(actuatorAMoving.advance)}
-                >
-                    Actuator A: {actuatorAMoving.advance ? 'ON' : 'OFF'}
-                </button>
-
-                {/* Actuator B Advance Button */}
-                <button
-                    onClick={() => setActuatorBMoving({ ...actuatorBMoving, advance: !actuatorBMoving.advance, retract: actuatorBMoving.advance })}
-                    style={styleTestButtons(actuatorBMoving.advance)}
-                >
-                    Actuator B: {actuatorBMoving.advance ? 'ON' : 'OFF'}
-                </button>
-
-                {/* Actuator C Advance Button */}
-                <button
-                    onClick={() => setActuatorCMoving({ ...actuatorCMoving, advance: !actuatorCMoving.advance, retract: actuatorCMoving.advance })}
-                    style={styleTestButtons(actuatorCMoving.advance)}
-                >
-                    Actuator C: {actuatorCMoving.advance ? 'ON' : 'OFF'}
-                </button>
-
-                {/* Create Parts Trigger */}
-                <button
-                    onClick={createTwoParts}
-                    style={{
-                        padding: '10px 10px',
-                        backgroundColor: 'rgba(33, 150, 243, 0.7)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px',
-                        fontWeight: 'bold',
-                    }}
-                >
-                    Create 2 Parts ({parts.length} total)
-                </button>
-
-            </div>
-
             {
                 // #region PlayButton
                 !simulationStart ? (
@@ -525,7 +234,7 @@ export function PlayFactory() {
                                         bodyIndex={89}
                                         bodyStyle={equipamentStyle({ width: 68, height: 253, left: 404, bottom: 19 })}
                                         beltStyle={equipamentStyle({ width: 68, bottom: 31, left: 0 })}
-                                        running={conveyorLeftRunning}
+                                        running={equipmentsValue.ConveyorLeftRunning && !conveyorLeftStopped}
                                         scaleFactor={getScaleCoefficient()}
                                     />
                                     <Robot
@@ -533,10 +242,10 @@ export function PlayFactory() {
                                         ref={robotLeftRef}
                                         bodyIndex={99}
                                         bodyStyle={equipamentStyle({ width: 153, height: 125, left: 296, bottom: 209 })}
-                                        moveToHome={robotLeftMoving.toHome}
-                                        moveToPick={robotLeftMoving.toPick}
-                                        moveToAntecipation={robotLeftMoving.toAntecipation}
-                                        moveToDrop={robotLeftMoving.toDrop}
+                                        moveToHome={equipmentsValue.RobotLeftToHome}
+                                        moveToPick={equipmentsValue.RobotLeftToPick}
+                                        moveToAntecipation={equipmentsValue.RobotLeftToAntecipation}
+                                        moveToDrop={equipmentsValue.RobotLeftMovingToDrop}
                                         setRobotMovement={setRobotLeftMovement}
                                         robotMovement={robotLeftMovement}
                                         scaleFactor={getScaleCoefficient()}
@@ -550,7 +259,7 @@ export function PlayFactory() {
                                         bodyIndex={89}
                                         bodyStyle={equipamentStyle({ width: 68, height: 253, right: 388, bottom: 19 })}
                                         beltStyle={equipamentStyle({ width: 68, bottom: 31, right: 0 })}
-                                        running={conveyorRightRunning}
+                                        running={equipmentsValue.ConveyorRightRunning && !conveyorRightStopped}
                                         scaleFactor={getScaleCoefficient()}
                                     />
                                     <Robot
@@ -558,10 +267,10 @@ export function PlayFactory() {
                                         ref={robotRightRef}
                                         bodyIndex={99}
                                         bodyStyle={equipamentStyle({ width: 153, height: 125, right: 275, bottom: 209 })}
-                                        moveToHome={robotRightMoving.toHome}
-                                        moveToPick={robotRightMoving.toPick}
-                                        moveToAntecipation={robotRightMoving.toAntecipation}
-                                        moveToDrop={robotRightMoving.toDrop}
+                                        moveToHome={equipmentsValue.RobotRightToHome}
+                                        moveToPick={equipmentsValue.RobotRightToPick}
+                                        moveToAntecipation={equipmentsValue.RobotRightToAntecipation}
+                                        moveToDrop={equipmentsValue.RobotRightMovingToDrop}
                                         setRobotMovement={setRobotRightMovement}
                                         robotMovement={robotRightMovement}
                                         scaleFactor={getScaleCoefficient()}
@@ -571,11 +280,14 @@ export function PlayFactory() {
                                 <section className='center'>
                                     <BigConveyor
                                         id={"big-conveyor"}
-                                        ref={bigConveyorRef}
+                                        firstRef={bigConveyorFirstRef}
+                                        secondRef={bigConveyorSecondRef}
                                         bodyIndex={89}
                                         bodyStyle={equipamentStyle({ width: 186, height: 369, top: 36, right: 354 })}
-                                        beltStyle={equipamentStyle({ width: 56, bottom: 31, left: 0 })}
-                                        running={bigConveyorRunning}
+                                        firstBeltStyle={equipamentStyle({ width: 56, height: 97, bottom: 31, left: 0 })}
+                                        secondBeltStyle={equipamentStyle({ width: 56, height: 243, bottom: 97 + 31, left: 0 })} // bottom = firstBeltStyle.height + firstBeltStyle.bottom
+                                        firstRunning={equipmentsValue.BigConveyorFirstRunning}
+                                        secondRunning={equipmentsValue.BigConveyorSecondRunning && !bigConveyorSecondStopped}
                                         scaleFactor={getScaleCoefficient()}
                                     />
                                     <Actuator
@@ -584,8 +296,8 @@ export function PlayFactory() {
                                         bodyIndex={99}
                                         bodyStyle={equipamentStyle({ width: 144, height: 44, top: 63, left: 412 })}
                                         axisStyle={equipamentStyle({ width: 144, height: 44, top: 0, left: -56 })}
-                                        advance={actuatorCMoving.advance}
-                                        retract={actuatorCMoving.retract}
+                                        advance={equipmentsValue.ActuatorCinAdvance}
+                                        retract={equipmentsValue.ActuatorCinRetract}
                                         scaleFactor={getScaleCoefficient()}
                                     />
                                     <Actuator
@@ -594,8 +306,8 @@ export function PlayFactory() {
                                         bodyIndex={99}
                                         bodyStyle={equipamentStyle({ width: 144, height: 44, top: 135, left: 412 })}
                                         axisStyle={equipamentStyle({ width: 144, height: 44, top: 0, left: -56 })}
-                                        advance={actuatorBMoving.advance}
-                                        retract={actuatorBMoving.retract}
+                                        advance={equipmentsValue.ActuatorBinAdvance}
+                                        retract={equipmentsValue.ActuatorBinRetract}
                                         scaleFactor={getScaleCoefficient()}
                                     />
                                     <Actuator
@@ -604,8 +316,8 @@ export function PlayFactory() {
                                         bodyIndex={99}
                                         bodyStyle={equipamentStyle({ width: 144, height: 44, top: 206, left: 412 })}
                                         axisStyle={equipamentStyle({ width: 144, height: 44, bottom: 0, left: -56 })}
-                                        advance={actuatorAMoving.advance}
-                                        retract={actuatorAMoving.retract}
+                                        advance={equipmentsValue.ActuatorAinAdvance}
+                                        retract={equipmentsValue.ActuatorAinRetract}
                                         scaleFactor={getScaleCoefficient()}
                                     />
                                 </section>
@@ -614,37 +326,45 @@ export function PlayFactory() {
                                     {parts.map((part) => (
                                         <Part
                                             key={part.id}
+                                            svgColor={part.svgColor}
                                             bodyIndex={90}
                                             bodyStyle={equipamentStyle({
                                                 width: 20,
                                                 height: 20,
-                                                ...(part.position === 'left' ? { left: 430 } : { right: 410 }),
-                                                bottom: 36
+                                                ...(part.position === 'left' ? { left: 430 } : { right: 410 }), // left: 510 (bigconveyor test)
+                                                bottom: 36 // 206 (bigconveyor test)
                                             })}
                                             conveyor={{
                                                 ref: part.position === 'left' ? conveyorLeftRef : conveyorRightRef,
-                                                running: part.position === 'left' ? conveyorLeftRunning : conveyorRightRunning,
+                                                running: part.position === 'left'
+                                                    ? (equipmentsValue.ConveyorLeftRunning && !conveyorLeftStopped)
+                                                    : (equipmentsValue.ConveyorRightRunning && !conveyorRightStopped),
+                                                onStopAreaReached: part.position === 'left' ? handleLeftPartStopAreaReached : handleRightPartStopAreaReached
                                             }}
+
                                             robot={{
                                                 ref: part.position === 'left' ? robotLeftRef : robotRightRef,
-                                                isGrabbed: part.position === 'left' ? robotLeftMoving.isGrabbed : robotRightMoving.isGrabbed,
+                                                isGrabbed: part.position === 'left' ? equipmentsValue.RobotLeftIsGrabbed : equipmentsValue.RobotRightIsGrabbed,
                                                 movement: part.position === 'left' ? robotLeftMovement : robotRightMovement,
                                             }}
                                             bigConveyor={{
-                                                ref: bigConveyorRef,
-                                                running: bigConveyorRunning,
+                                                firstRef: bigConveyorFirstRef,
+                                                secondRef: bigConveyorSecondRef,
+                                                firstRunning: equipmentsValue.BigConveyorFirstRunning,
+                                                secondRunning: equipmentsValue.BigConveyorSecondRunning && !bigConveyorSecondStopped,
+                                                onStopAreaReached: handleBigConveyorStopAreaReached,
                                             }}
                                             actuatorA={{
                                                 ref: actuatorARef,
-                                                movement: actuatorAMoving
+                                                movement: { advance: equipmentsValue.ActuatorAinAdvance, retract: equipmentsValue.ActuatorAinRetract }
                                             }}
                                             actuatorB={{
                                                 ref: actuatorBRef,
-                                                movement: actuatorBMoving
+                                                movement: { advance: equipmentsValue.ActuatorBinAdvance, retract: equipmentsValue.ActuatorBinRetract }
                                             }}
                                             actuatorC={{
                                                 ref: actuatorCRef,
-                                                movement: actuatorCMoving
+                                                movement: { advance: equipmentsValue.ActuatorCinAdvance, retract: equipmentsValue.ActuatorCinRetract }
                                             }}
                                             scaleFactor={getScaleCoefficient()}
                                         />
