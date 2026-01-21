@@ -148,16 +148,16 @@ export default function PlayFactory({ simulationStart, setSimulationStart, equip
 
     // Reset conveyor stopped state when robot grabs the part
     useEffect(() => {
-        if (equipmentsValue.RobotLeftIsGrabbed && conveyorLeftStopped) {
+        if (equipmentsValue.RobotLeftToAntecipation && conveyorLeftStopped) {
             setConveyorLeftStopped(false);
         }
-    }, [equipmentsValue.RobotLeftIsGrabbed, conveyorLeftStopped]);
+    }, [equipmentsValue.RobotLeftToAntecipation, conveyorLeftStopped]);
 
     useEffect(() => {
-        if (equipmentsValue.RobotRightIsGrabbed && conveyorRightStopped) {
+        if (equipmentsValue.RobotRightToAntecipation && conveyorRightStopped) {
             setConveyorRightStopped(false);
         }
-    }, [equipmentsValue.RobotRightIsGrabbed, conveyorRightStopped]);
+    }, [equipmentsValue.RobotRightToAntecipation, conveyorRightStopped]);
 
     // Reset big conveyor stopped state when any actuator advances (pushes the part)
     useEffect(() => {
