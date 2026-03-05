@@ -46,6 +46,13 @@ Together, these components enable seamless communication between industrial auto
                                 │  └─────────┘ └─────────┘ └──────────────────┘    │
                                 └──────────────────────────────────────────────────┘
 ```
+<div align="center">
+
+**Part of the Embedded Integration project ecosystem**
+
+[Backend Repository](https://github.com/igor-fuchs/Embedded-Integration-Backend) • [Bridge Repository](https://github.com/igor-fuchs/Embedded-Integration-Bridge)
+
+</div>
 
 ---
 
@@ -199,12 +206,6 @@ This project is for educational and demonstration purposes.
 
 ---
 
-<div align="center">
 
-**Part of the Embedded Integration project ecosystem**
-
-[Backend Repository](https://github.com/igor-fuchs/Embedded-Integration-Backend) • [Bridge Repository](https://github.com/igor-fuchs/Embedded-Integration-Bridge)
-
-</div>
 
 
